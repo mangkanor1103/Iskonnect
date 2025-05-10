@@ -5,5 +5,7 @@
         <p class="text-sm text-center">&copy; 2025 Iskonnect. All rights reserved.</p>
     </div>
 </footer>
+<!-- Include logout confirmation script -->
+<script src="components/logout.js"></script>
 </body>
 </html>
