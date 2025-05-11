@@ -1,7 +1,7 @@
 <?php 
 include '../components/session_check.php';
 
-// Check if user is logged in and has staff role
+// Check if user is logged in and has ched role
 redirect_if_not_authorized('ched');
 
 include '../components/conn.php';
@@ -140,7 +140,7 @@ if (!$result) {
         <div class="bg-white shadow-sm border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
             <div class="flex items-center">
                 <h2 class="text-xl font-semibold text-gray-800">Pending Students</h2>
-                <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Staff</div>
+                <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">CHED</div>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="relative">

@@ -1,7 +1,7 @@
 <?php 
 include '../components/session_check.php';
 
-// Check if user is logged in and has staff role
+// Check if user is logged in and has ched role
 redirect_if_not_authorized('ched');
 
 include '../components/conn.php';
@@ -45,7 +45,7 @@ if (!$result) {
                 <svg class="w-8 h-8 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
                 </svg>
-                <h1 class="text-xl font-bold">Staff Portal</h1>
+                <h1 class="text-xl font-bold">CHED Portal</h1>
             </div>
         </div>
         <nav class="flex-1">
@@ -97,10 +97,9 @@ if (!$result) {
             <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold">
                     <?php echo strtoupper(substr($username, 0, 1)); ?>
-                </div>
-                <div class="ml-3">
+                </div>                <div class="ml-3">
                     <p class="text-sm font-medium text-gray-700"><?php echo $username; ?></p>
-                    <p class="text-xs text-gray-500">Staff Member</p>
+                    <p class="text-xs text-gray-500">CHED Member</p>
                 </div>
             </div>
         </div>

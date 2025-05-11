@@ -1,7 +1,7 @@
 <?php 
 include '../components/session_check.php';
 
-// Check if user is logged in and has staff role
+// Check if user is logged in and has ched role
 redirect_if_not_authorized('ched');
 
 include '../components/conn.php';
@@ -97,10 +97,9 @@ if (!$result) {
             <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold">
                     <?php echo strtoupper(substr($username, 0, 1)); ?>
-                </div>
-                <div class="ml-3">
+                </div>                <div class="ml-3">
                     <p class="text-sm font-medium text-gray-700"><?php echo $username; ?></p>
-                    <p class="text-xs text-gray-500">Staff Member</p>
+                    <p class="text-xs text-gray-500">CHED Member</p>
                 </div>
             </div>
         </div>
@@ -111,10 +110,9 @@ if (!$result) {
         <div id="particles-js" class="absolute inset-0 opacity-30"></div>
         
         <!-- Top Navigation Bar -->
-        <div class="bg-white shadow-sm border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
-            <div class="flex items-center">
+        <div class="bg-white shadow-sm border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-10">            <div class="flex items-center">
                 <h2 class="text-xl font-semibold text-gray-800">Approved Students</h2>
-                <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Staff</div>
+                <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">CHED</div>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="relative">

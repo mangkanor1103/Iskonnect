@@ -1,7 +1,7 @@
 <?php 
 include '../components/session_check.php';
 
-// Check if user is logged in and has staff role
+// Check if user is logged in and has ched role
 redirect_if_not_authorized('ched');
 
 include '../components/conn.php';
