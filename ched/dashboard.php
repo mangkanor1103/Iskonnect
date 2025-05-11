@@ -126,6 +126,14 @@ $username = $_SESSION['username'];
                                 </svg>
                             </a>
                         </div>
+                        <div class="mt-6 inline-flex rounded-md shadow">
+                            <a href="students.php" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition">
+                                View Pending Applications
+                                <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                     <div class="md:w-1/2 bg-green-100 p-8 flex items-center justify-center">
                         <div class="w-full max-w-sm">
@@ -137,49 +145,7 @@ $username = $_SESSION['username'];
             
             <!-- Quick Stats -->
             <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <!-- Quick Stat 1 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Today's Tasks</dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">8</div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick Stat 2 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Completed Tasks</dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">5</div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick Stat 3 -->
+                <!-- Pending Students Count -->
                 <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex items-center">
@@ -190,9 +156,16 @@ $username = $_SESSION['username'];
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Pending Reports</dt>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Pending Applications</dt>
                                     <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">3</div>
+                                        <div class="text-2xl font-semibold text-gray-900">
+                                            <?php
+                                            $pending_query = "SELECT COUNT(*) as count FROM students WHERE status = 'Pending'";
+                                            $pending_result = mysqli_query($conn, $pending_query);
+                                            $pending_count = mysqli_fetch_assoc($pending_result)['count'];
+                                            echo $pending_count;
+                                            ?>
+                                        </div>
                                     </dd>
                                 </dl>
                             </div>
@@ -200,20 +173,83 @@ $username = $_SESSION['username'];
                     </div>
                 </div>
                 
-                <!-- Quick Stat 4 -->
+                <!-- Approved Students Count -->
                 <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
                                 <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Upcoming Events</dt>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Approved Students</dt>
                                     <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">2</div>
+                                        <div class="text-2xl font-semibold text-gray-900">
+                                            <?php
+                                            $approved_query = "SELECT COUNT(*) as count FROM students WHERE status = 'Approved'";
+                                            $approved_result = mysqli_query($conn, $approved_query);
+                                            $approved_count = mysqli_fetch_assoc($approved_result)['count'];
+                                            echo $approved_count;
+                                            ?>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rejected Students Count -->
+                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
+                                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Rejected Students</dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900">
+                                            <?php
+                                            $rejected_query = "SELECT COUNT(*) as count FROM students WHERE status = 'Rejected'";
+                                            $rejected_result = mysqli_query($conn, $rejected_query);
+                                            $rejected_count = mysqli_fetch_assoc($rejected_result)['count'];
+                                            echo $rejected_count;
+                                            ?>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Total Students Count -->
+                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Applications</dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900">
+                                            <?php
+                                            $total_query = "SELECT COUNT(*) as count FROM students";
+                                            $total_result = mysqli_query($conn, $total_query);
+                                            $total_count = mysqli_fetch_assoc($total_result)['count'];
+                                            echo $total_count;
+                                            ?>
+                                        </div>
                                     </dd>
                                 </dl>
                             </div>
@@ -226,42 +262,60 @@ $username = $_SESSION['username'];
             <div class="mt-6">
                 <div class="bg-white shadow rounded-lg">
                     <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Activities</h3>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Application Activities</h3>
                     </div>
                     <div class="divide-y divide-gray-200">
-                        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-green-600 truncate">Task submission completed</p>
-                                    <p class="text-sm text-gray-500">Weekly report was submitted successfully</p>
+                        <?php
+                        // Get recent updated applications
+                        $recent_query = "SELECT s.*, DATE_FORMAT(s.updated_at, '%M %d, %Y, %h:%i %p') as formatted_date 
+                                        FROM students s 
+                                        WHERE s.updated_at IS NOT NULL 
+                                        ORDER BY s.updated_at DESC LIMIT 5";
+                        $recent_result = mysqli_query($conn, $recent_query);
+                        
+                        if (mysqli_num_rows($recent_result) > 0) {
+                            while ($row = mysqli_fetch_assoc($recent_result)) {
+                                $status_color = "";
+                                $status_text = "";
+                                
+                                switch ($row['status']) {
+                                    case 'Approved':
+                                        $status_color = "text-green-600";
+                                        $status_text = "Application Approved";
+                                        break;
+                                    case 'Rejected':
+                                        $status_color = "text-red-600";
+                                        $status_text = "Application Rejected";
+                                        break;
+                                    case 'Pending':
+                                        $status_color = "text-yellow-600";
+                                        $status_text = "Application Pending";
+                                        break;
+                                }
+                                ?>
+                                <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-medium <?php echo $status_color; ?> truncate"><?php echo $status_text; ?></p>
+                                            <p class="text-sm text-gray-500">
+                                                <?php echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?> - 
+                                                <?php echo htmlspecialchars($row['student_id']); ?>
+                                            </p>
+                                            <?php if (!empty($row['office_remarks'])): ?>
+                                                <p class="text-xs text-gray-400 mt-1"><?php echo htmlspecialchars($row['office_remarks']); ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="ml-4 flex-shrink-0">
+                                            <p class="text-sm text-gray-500"><?php echo $row['formatted_date']; ?></p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="ml-4 flex-shrink-0">
-                                    <p class="text-sm text-gray-500">Today, 10:30 AM</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-green-600 truncate">New task assigned</p>
-                                    <p class="text-sm text-gray-500">Department meeting preparation</p>
-                                </div>
-                                <div class="ml-4 flex-shrink-0">
-                                    <p class="text-sm text-gray-500">Today, 9:15 AM</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-green-600 truncate">Reminder</p>
-                                    <p class="text-sm text-gray-500">Document submission deadline tomorrow</p>
-                                </div>
-                                <div class="ml-4 flex-shrink-0">
-                                    <p class="text-sm text-gray-500">Yesterday, 4:45 PM</p>
-                                </div>
-                            </div>
-                        </div>
+                                <?php
+                            }
+                        } else {
+                            echo '<div class="px-4 py-5 text-center text-gray-500">No recent activities found</div>';
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
