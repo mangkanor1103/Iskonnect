@@ -60,6 +60,8 @@ function get_dashboard_by_role($role) {
             return 'staff/dashboard.php';
         case 'ched':
             return 'ched/dashboard.php';
+        case 'student':
+            return 'student/dashboard.php';
         default:
             return 'index.php';
     }

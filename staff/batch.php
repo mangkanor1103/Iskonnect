@@ -103,14 +103,13 @@ try {
 <?php include '../components/header.php'; ?>
 
 <div class="flex h-screen bg-white overflow-hidden">
-    <!-- Sidebar - Reuse the same sidebar from approved.php -->
-    <div class="w-64 bg-white border-r border-green-100 flex flex-col shadow-lg z-10 relative">
+    <!-- Sidebar - Reuse the same sidebar from approved.php -->    <div class="w-64 bg-white border-r border-green-100 flex flex-col shadow-lg z-10 relative">
         <div class="p-4 mb-2 bg-gradient-to-r from-green-500 to-green-400 text-white">
             <div class="flex items-center justify-center">
                 <svg class="w-8 h-8 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
                 </svg>
-                <h1 class="text-xl font-bold">CHED Portal</h1>
+                <h1 class="text-xl font-bold">Staff Portal</h1>
             </div>
         </div>
         <nav class="flex-1">
@@ -138,13 +137,20 @@ try {
                         </svg>
                         <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Approved Students</span>
                     </a>
-                </li>
-                <li class="group">
+                </li>                <li class="group">
                     <a href="reject.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
                         <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span class="ml-3 text-gray-700 group-hover:text-red-700 font-medium">Rejected Students</span>
+                    </a>
+                </li>
+                <li class="group">
+                    <a href="create_post.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
+                        <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Create Scholarship Post</span>
                     </a>
                 </li>
                 <li class="border-t border-gray-100 my-2 pt-2"></li>
@@ -162,10 +168,9 @@ try {
             <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold">
                     <?php echo strtoupper(substr($username, 0, 1)); ?>
-                </div>
-                <div class="ml-3">
+                </div>                <div class="ml-3">
                     <p class="text-sm font-medium text-gray-700"><?php echo $username; ?></p>
-                    <p class="text-xs text-gray-500">CHED Member</p>
+                    <p class="text-xs text-gray-500">Staff</p>
                 </div>
             </div>
         </div>

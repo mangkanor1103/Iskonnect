@@ -7,6 +7,55 @@ redirect_if_not_authorized('ched');
 include '../components/conn.php';
 
 $username = $_SESSION['username'];
+
+// IP address for local network access
+$server_ip = "192.168.92.10";
+$form_url = "http://$server_ip/iskonnect/students.php";
+
+// Add network check JavaScript function
+$network_check_js = "
+    function checkNetwork() {
+        // Create a unique endpoint with timestamp to avoid caching
+        const testEndpoint = 'http://$server_ip/iskonnect/components/network_check.php?t=' + new Date().getTime();
+        
+        return fetch(testEndpoint, { 
+            mode: 'no-cors',
+            cache: 'no-cache',
+            timeout: 2000
+        })
+        .then(() => {
+            const statusEl = document.getElementById('network-status');
+            if(statusEl) {
+                statusEl.innerHTML = '<span class=\"bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Connected to network</span>';
+            }
+            const messageEl = document.getElementById('network-message');
+            if(messageEl) {
+                messageEl.classList.add('hidden');
+            }
+            return true;
+        })
+        .catch(() => {
+            const statusEl = document.getElementById('network-status');
+            if(statusEl) {
+                statusEl.innerHTML = '<span class=\"bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Not on the same network</span>';
+            }
+            const messageEl = document.getElementById('network-message');
+            if(messageEl) {
+                messageEl.classList.remove('hidden');
+            }
+            return false;
+        });
+    }
+    
+    // Check network status when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        if(document.getElementById('network-status')) {
+            checkNetwork();
+            // Re-check every 10 seconds
+            setInterval(checkNetwork, 10000);
+        }
+    });
+";
 ?>
 
 <?php include '../components/header.php'; ?>
@@ -14,6 +63,7 @@ $username = $_SESSION['username'];
 <!-- Add required libraries for animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script src="../components/qr_script.js"></script>
 
 <div class="flex h-screen bg-white overflow-hidden">
     <!-- Improved Sidebar with subtle gradient -->
@@ -23,7 +73,7 @@ $username = $_SESSION['username'];
                 <svg class="w-8 h-8 mr-2 animate-pulse" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
                 </svg>
-                <h1 class="text-xl font-bold">CHED Portal</h1>
+                <h1 class="text-xl font-bold">Scholarship Admin Portal</h1>
             </div>
         </div>
         <nav class="flex-1">
@@ -51,13 +101,20 @@ $username = $_SESSION['username'];
                         </svg>
                         <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Approved Students</span>
                     </a>
-                </li>
-                <li class="group">
+                </li>                <li class="group">
                     <a href="reject.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
                         <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span class="ml-3 text-gray-700 group-hover:text-red-700 font-medium">Rejected Students</span>
+                    </a>
+                </li>
+                <li class="group">
+                    <a href="qr_code.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
+                        <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-2 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                        </svg>
+                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">QR Code</span>
                     </a>
                 </li>
                 <li class="border-t border-gray-100 my-2 pt-2"></li>
@@ -78,7 +135,7 @@ $username = $_SESSION['username'];
                 </div>
                 <div class="ml-3">
                     <p class="text-sm font-medium text-gray-700"><?php echo $username; ?></p>
-                    <p class="text-xs text-gray-500">CHED Officer</p>
+                    <p class="text-xs text-gray-500">Scholarship admin</p>
                 </div>
             </div>
         </div>
@@ -91,8 +148,8 @@ $username = $_SESSION['username'];
         <!-- Top Navigation Bar -->
         <div class="bg-white shadow-sm border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
             <div class="flex items-center">
-                <h2 class="text-xl font-semibold text-gray-800">CHED Dashboard</h2>
-                <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">CHED</div>
+                <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Scholarship admin</div>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="relative">
@@ -114,18 +171,10 @@ $username = $_SESSION['username'];
             <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
                 <div class="flex flex-col md:flex-row">
                     <div class="md:w-1/2 p-8">
-                        <div class="uppercase tracking-wide text-sm text-green-500 font-semibold">CHED Dashboard</div>
+                        <div class="uppercase tracking-wide text-sm text-green-500 font-semibold">Dashboard</div>
                         <h1 class="mt-2 text-4xl font-bold text-gray-800 leading-tight">Welcome, <?php echo $username; ?>!</h1>
-                        <p class="mt-4 text-gray-600">You have successfully logged in to your CHED portal. From here, you can manage your daily tasks, view your schedule, and submit reports.</p>
+                        <p class="mt-4 text-gray-600">You have successfully logged in to your scholarship admin portal.</p>
                         
-                        <div class="mt-6 inline-flex rounded-md shadow">
-                            <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition">
-                                View Today's Tasks
-                                <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                </svg>
-                            </a>
-                        </div>
                         <div class="mt-6 inline-flex rounded-md shadow">
                             <a href="students.php" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition">
                                 View Pending Applications
@@ -133,11 +182,6 @@ $username = $_SESSION['username'];
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                 </svg>
                             </a>
-                        </div>
-                    </div>
-                    <div class="md:w-1/2 bg-green-100 p-8 flex items-center justify-center">
-                        <div class="w-full max-w-sm">
-                            <img src="https://cdn.pixabay.com/photo/2017/01/31/15/33/calendar-2025112_1280.png" alt="Staff Work Illustration" class="w-full h-auto animate__animated animate__pulse animate__infinite animate__slower">
                         </div>
                     </div>
                 </div>
@@ -319,6 +363,7 @@ $username = $_SESSION['username'];
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </div>
@@ -398,6 +443,11 @@ document.addEventListener('DOMContentLoaded', function() {
         "retina_detect": true
     });
 });
+</script>
+
+<!-- Network check script -->
+<script>
+<?php echo $network_check_js; ?>
 </script>
 
 <?php include '../components/footer.php'; ?>

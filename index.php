@@ -22,17 +22,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
-            
-            // Return JSON response for AJAX
+              // Return JSON response for AJAX
             header('Content-Type: application/json');
+            
+            // Determine the correct redirect URL based on role
+            $redirectUrl = '';
+            switch($user['role']) {
+                case 'admin':
+                    $redirectUrl = 'dashboard.php';
+                    break;
+                case 'staff':
+                    $redirectUrl = 'staff/dashboard.php';
+                    break;
+                case 'student':
+                    $redirectUrl = 'student/dashboard.php';
+                    break;
+                case 'ched':
+                    $redirectUrl = 'ched/dashboard.php';
+                    break;
+                default:
+                    // Default fallback to student dashboard for any new roles
+                    $redirectUrl = 'student/dashboard.php';
+            }
+            
             echo json_encode([
                 'success' => true,
                 'role' => $user['role'],
-                'redirect' => $user['role'] === 'admin' 
-                    ? 'dashboard.php' 
-                    : ($user['role'] === 'staff' 
-                        ? 'staff/dashboard.php' 
-                        : 'ched/dashboard.php')
+                'redirect' => $redirectUrl
             ]);
             exit();
         } else {
@@ -215,6 +231,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </button>
                         </form>
 
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-600">Don't have an account? <a href="register.php" class="text-green-600 hover:text-green-700 font-medium transition">Sign up as a student</a></p>
+                        </div>
+
                         <div class="mt-6 text-center">
                             <p class="text-sm text-gray-600">© 2025 Iskonnect. All rights reserved.</p>
                         </div>
@@ -337,8 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Show success message with SweetAlert2
+                    if (data.success) {                        // Show success message with SweetAlert2
                         Swal.fire({
                             icon: 'success',
                             title: 'Welcome Back!',
@@ -351,7 +370,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 Swal.showLoading();
                             }
                         }).then(() => {
-                            window.location.href = data.redirect;
+                            // Ensure student users go to student dashboard
+                            if (data.role === 'student') {
+                                window.location.href = 'student/dashboard.php';
+                            } else {
+                                window.location.href = data.redirect;
+                            }
                         });
                     } else {
                         // Show error message

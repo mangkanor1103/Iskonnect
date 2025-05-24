@@ -2,6 +2,36 @@
 include 'components/header.php'; 
 include 'components/conn.php';
 
+// Network access check - restricts access only to local network users
+$server_ip = "192.168.92.10";
+$client_ip = $_SERVER['REMOTE_ADDR'];
+
+function isOnSameNetwork($client_ip, $server_ip) {
+    // Extract IP parts and convert to subnet
+    $client_parts = explode('.', $client_ip);
+    $server_parts = explode('.', $server_ip);
+    
+    // Check if both are on same Class C subnet (first 3 octets match)
+    return ($client_parts[0] == $server_parts[0] && 
+            $client_parts[1] == $server_parts[1] && 
+            $client_parts[2] == $server_parts[2]);
+}
+
+// Only allow if the client is on the same network as the server
+$same_network = isOnSameNetwork($client_ip, $server_ip);
+
+// Variable to determine if we should display access warning
+$show_warning = false;
+
+// If IP is localhost/127.0.0.1, it's a direct server access (development mode)
+// OR if they're on the same network subnet
+$allowed_access = ($client_ip == "127.0.0.1" || $client_ip == "::1" || $same_network);
+
+// If access is not allowed, show warning
+if (!$allowed_access) {
+    $show_warning = true;
+}
+
 // Check if form is submitted and process the form data
 if(isset($_POST['submit_application'])) {
     // Process photo upload
@@ -348,11 +378,32 @@ if(isset($_POST['submit_application'])) {
 
         <!-- Data Privacy Notice -->
         <div class="p-4 bg-gray-100 border-b">
-            <p class="text-sm italic text-gray-700"><strong>DATA PRIVACY CLAUSE:</strong> By completing this form, I hereby agree that Mindoro State University, may collect, use, disclose, and process my personal data for the purposes of application for education, scholarships or enrollment. Requests for inspection, amendment, or restriction of records must be in writing and addressed to the Office of Student Affairs and Services and must specify the reasons for the request. Mindoro State University reserves the right to respond appropriately according to law.</p>
-        </div>
+            <p class="text-sm italic text-gray-700"><strong>DATA PRIVACY CLAUSE:</strong> By completing this form, I hereby agree that Mindoro State University, may collect, use, disclose, and process my personal data for the purposes of application for education, scholarships or enrollment. Requests for inspection, amendment, or restriction of records must be in writing and addressed to the Office of Student Affairs and Services and must specify the reasons for the request. Mindoro State University reserves the right to respond appropriately according to law.</p>        </div>
 
-        <form class="p-6" method="post" enctype="multipart/form-data">
+        <?php if ($show_warning): ?>
+        <div class="m-6 p-4 bg-red-100 border-l-4 border-red-500 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-lg font-medium text-red-800">Network Access Restriction</p>
+                    <p class="text-red-700 mt-1">You must be connected to the same network as the server (<?php echo $server_ip; ?>) to access this form.</p>
+                    <p class="text-red-600 mt-2">Your IP address: <?php echo $client_ip; ?></p>
+                    <p class="text-red-700 mt-2">Please connect to the designated network and try again.</p>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <form class="p-6" method="post" enctype="multipart/form-data" <?php echo $show_warning ? 'onsubmit="return false;"' : ''; ?>>
             <!-- Tab Navigation -->
+            
+            <?php if ($show_warning): ?>
+            <input type="hidden" id="network-warning-exists" value="1">
+            <?php endif; ?>
             <div class="mb-6">
                 <div class="flex border-b border-gray-200">
                     <button type="button" class="py-2 px-4 text-center border-b-2 border-green-500 font-medium text-sm text-green-600 bg-white tab-btn active" onclick="showTab('personal-tab')">

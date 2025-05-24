@@ -52,12 +52,27 @@ $username = $_SESSION['username'];
                         <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Approved Students</span>
                     </a>
                 </li>
-                                <li class="group">
-                    <a href="reject.php" class="flex items-center p-3 rounded-lg bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
-                        <svg class="w-5 h-5 text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <li class="group">
+                    <a href="reject.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
+                        <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span class="ml-3 text-gray-700 group-hover:text-red-700 font-medium">Rejected Students</span>
+                    </a>
+                </li>                <li class="group">
+                    <a href="create_post.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
+                        <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Create Scholarship Post</span>
+                    </a>
+                </li>
+                <li class="group">
+                    <a href="qr_code.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
+                        <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-2 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                        </svg>
+                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">QR Code</span>
                     </a>
                 </li>
                 <li class="border-t border-gray-100 my-2 pt-2"></li>
@@ -110,26 +125,30 @@ $username = $_SESSION['username'];
         </div>
         
         <!-- Welcome Section -->
-        <div class="p-6 animate__animated animate__fadeIn">
+        <div class="p-6 animate__animated animate__fadeIn">            
             <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
                 <div class="flex flex-col md:flex-row">
-                    <div class="md:w-1/2 p-8">
+                    <div class="md:w-2/3 p-8">
                         <div class="uppercase tracking-wide text-sm text-green-500 font-semibold">Staff Dashboard</div>
                         <h1 class="mt-2 text-4xl font-bold text-gray-800 leading-tight">Welcome, <?php echo $username; ?>!</h1>
-                        <p class="mt-4 text-gray-600">You have successfully logged in to your staff portal. From here, you can manage your daily tasks, view your schedule, and submit reports.</p>
-                        
-                        <div class="mt-6 inline-flex rounded-md shadow">
-                            <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition">
-                                View Today's Tasks
-                                <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                </svg>
-                            </a>
-                        </div>
+                        <p class="mt-4 text-gray-600 leading-relaxed">
+                            You have successfully logged in to your staff portal.
+                        </p>
                     </div>
-                    <div class="md:w-1/2 bg-green-100 p-8 flex items-center justify-center">
-                        <div class="w-full max-w-sm">
-                            <img src="https://cdn.pixabay.com/photo/2017/01/31/15/33/calendar-2025112_1280.png" alt="Staff Work Illustration" class="w-full h-auto animate__animated animate__pulse animate__infinite animate__slower">
+                    <div class="md:w-1/3 p-8 bg-blue-50 border-l border-blue-100">
+                        <div class="uppercase tracking-wide text-sm text-blue-500 font-semibold">Quick Access</div>
+                        <h2 class="mt-2 text-2xl font-bold text-gray-800 leading-tight">Contact CHED</h2>
+                        <p class="mt-4 text-gray-600 leading-relaxed">
+                            Need assistance with scholarship inquiries? Contact CHED directly.
+                        </p>
+                        <div class="mt-6">
+                            <a href="mailto:info@ched.gov.ph?subject=Inquiry%20from%20Iskonnect%20Staff&body=Hello%20CHED,%0A%0AI%20am%20reaching%20out%20regarding%20a%20scholarship%20inquiry.%0A%0ARegards,%0A<?php echo urlencode($username); ?>" 
+                               class="inline-flex items-center px-4 py-2 border border-green-300 rounded-md shadow-sm text-sm font-medium text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                Contact CHED
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -137,49 +156,69 @@ $username = $_SESSION['username'];
             
             <!-- Quick Stats -->
             <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <!-- Quick Stat 1 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Today's Tasks</dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">8</div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <?php
+                // Get counts for the current staff user
+                $staffId = $_SESSION['user_id'];
                 
-                <!-- Quick Stat 2 -->
-                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Completed Tasks</dt>
-                                    <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">5</div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                // Initialize counts
+                $pendingCount = 0;
+                $approvedCount = 0;
+                $rejectedCount = 0;
+                $postsCount = 0;
                 
-                <!-- Quick Stat 3 -->
+                // Check if the tables exist before attempting queries
+                $tables = [];
+                $tablesQuery = $conn->query("SHOW TABLES");
+                while($table = $tablesQuery->fetch_array()) {
+                    $tables[] = $table[0];
+                }
+                
+                // Count pending students if table exists
+                if (in_array('students', $tables)) {
+                    try {
+                        $pendingQuery = $conn->prepare("SELECT COUNT(*) as count FROM students WHERE status = 'pending'");
+                        $pendingQuery->execute();
+                        $pendingResult = $pendingQuery->get_result();
+                        $pendingCount = $pendingResult->fetch_assoc()['count'];
+                    } catch (Exception $e) {
+                        // Silently handle the error
+                    }
+                    
+                    // Count approved students
+                    try {
+                        $approvedQuery = $conn->prepare("SELECT COUNT(*) as count FROM students WHERE status = 'approved'");
+                        $approvedQuery->execute();
+                        $approvedResult = $approvedQuery->get_result();
+                        $approvedCount = $approvedResult->fetch_assoc()['count'];
+                    } catch (Exception $e) {
+                        // Silently handle the error
+                    }
+                    
+                    // Count rejected students
+                    try {
+                        $rejectedQuery = $conn->prepare("SELECT COUNT(*) as count FROM students WHERE status = 'rejected'");
+                        $rejectedQuery->execute();
+                        $rejectedResult = $rejectedQuery->get_result();
+                        $rejectedCount = $rejectedResult->fetch_assoc()['count'];
+                    } catch (Exception $e) {
+                        // Silently handle the error
+                    }
+                }
+                
+                // Count all scholarship posts if table exists
+                if (in_array('scholarship_posts', $tables)) {
+                    try {
+                        $postsQuery = $conn->prepare("SELECT COUNT(*) as count FROM scholarship_posts");
+                        $postsQuery->execute();
+                        $postsResult = $postsQuery->get_result();
+                        $postsCount = $postsResult->fetch_assoc()['count'];
+                    } catch (Exception $e) {
+                        // Silently handle the error
+                    }
+                }
+                ?>
+                
+                <!-- Pending Students -->
                 <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex items-center">
@@ -190,34 +229,88 @@ $username = $_SESSION['username'];
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Pending Reports</dt>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Pending Students</dt>
                                     <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">3</div>
+                                        <div class="text-2xl font-semibold text-gray-900"><?php echo $pendingCount; ?></div>
                                     </dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
+                    <div class="bg-yellow-50 px-4 py-2">
+                        <a href="students.php" class="text-sm text-yellow-600 hover:text-yellow-900 font-medium">View all</a>
+                    </div>
                 </div>
                 
-                <!-- Quick Stat 4 -->
+                <!-- Approved Students -->
                 <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
                                 <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Upcoming Events</dt>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Approved Students</dt>
                                     <dd class="flex items-baseline">
-                                        <div class="text-2xl font-semibold text-gray-900">2</div>
+                                        <div class="text-2xl font-semibold text-gray-900"><?php echo $approvedCount; ?></div>
                                     </dd>
                                 </dl>
                             </div>
                         </div>
+                    </div>
+                    <div class="bg-green-50 px-4 py-2">
+                        <a href="approved.php" class="text-sm text-green-600 hover:text-green-900 font-medium">View all</a>
+                    </div>
+                </div>
+                
+                <!-- Rejected Students -->
+                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
+                                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Rejected Students</dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900"><?php echo $rejectedCount; ?></div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 px-4 py-2">
+                        <a href="reject.php" class="text-sm text-red-600 hover:text-red-900 font-medium">View all</a>
+                    </div>
+                </div>
+                
+                <!-- Scholarship Posts -->
+                <div class="bg-white overflow-hidden shadow rounded-lg transition-transform duration-300 hover:-translate-y-1">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Scholarship Posts</dt>
+                                    <dd class="flex items-baseline">
+                                        <div class="text-2xl font-semibold text-gray-900"><?php echo $postsCount; ?></div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 px-4 py-2">
+                        <a href="create_post.php" class="text-sm text-blue-600 hover:text-blue-900 font-medium">Create new</a>
                     </div>
                 </div>
             </div>
@@ -229,39 +322,102 @@ $username = $_SESSION['username'];
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Activities</h3>
                     </div>
                     <div class="divide-y divide-gray-200">
-                        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-green-600 truncate">Task submission completed</p>
-                                    <p class="text-sm text-gray-500">Weekly report was submitted successfully</p>
+                        <?php
+                        // Get recent student application activities
+                        $recentActivities = array();
+                        
+                        // Check if students table exists
+                        if (in_array('students', $tables)) {
+                            try {
+                                // Get 3 most recently updated student applications
+                                $activityQuery = $conn->prepare("SELECT id, fullname, status, updated_at FROM students ORDER BY updated_at DESC LIMIT 3");
+                                $activityQuery->execute();
+                                $activityResult = $activityQuery->get_result();
+                                
+                                while ($activity = $activityResult->fetch_assoc()) {
+                                    $status = ucfirst($activity['status']);
+                                    $activityType = "Student Application";
+                                    $description = "Student: " . htmlspecialchars($activity['fullname']);
+                                    $recentActivities[] = array(
+                                        'type' => $activityType,
+                                        'status' => $status,
+                                        'description' => $description,
+                                        'time' => $activity['updated_at']
+                                    );
+                                }
+                            } catch (Exception $e) {
+                                // Silently handle the error
+                            }
+                        }
+                        
+                        // Check if scholarship_posts table exists
+                        if (in_array('scholarship_posts', $tables)) {
+                            try {
+                                // Get 2 most recently created scholarship posts
+                                $postsQuery = $conn->prepare("SELECT id, title, created_at FROM scholarship_posts ORDER BY created_at DESC LIMIT 2");
+                                $postsQuery->execute();
+                                $postsResult = $postsQuery->get_result();
+                                
+                                while ($post = $postsResult->fetch_assoc()) {
+                                    $recentActivities[] = array(
+                                        'type' => "Scholarship Post",
+                                        'status' => "Created",
+                                        'description' => "Title: " . htmlspecialchars($post['title']),
+                                        'time' => $post['created_at']
+                                    );
+                                }
+                            } catch (Exception $e) {
+                                // Silently handle the error
+                            }
+                        }
+                        
+                        // Sort activities by time (most recent first)
+                        usort($recentActivities, function($a, $b) {
+                            return strtotime($b['time']) - strtotime($a['time']);
+                        });
+                        
+                        // Display activities or a message if none found
+                        if (count($recentActivities) > 0) {
+                            foreach (array_slice($recentActivities, 0, 3) as $activity) {
+                                $statusClass = "text-blue-600";
+                                $bgClass = "bg-blue-100";
+                                
+                                if ($activity['status'] == 'Approved') {
+                                    $statusClass = "text-green-600";
+                                    $bgClass = "bg-green-100";
+                                } else if ($activity['status'] == 'Rejected') {
+                                    $statusClass = "text-red-600";
+                                    $bgClass = "bg-red-100";
+                                } else if ($activity['status'] == 'Pending') {
+                                    $statusClass = "text-yellow-600";
+                                    $bgClass = "bg-yellow-100";
+                                }
+                                
+                                $formattedTime = date("M j, g:i A", strtotime($activity['time']));
+                                ?>
+                                <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-medium <?php echo $statusClass; ?> truncate">
+                                                <?php echo $activity['type']; ?> - <span class="<?php echo $bgClass; ?> px-2 py-0.5 rounded-full text-xs"><?php echo $activity['status']; ?></span>
+                                            </p>
+                                            <p class="text-sm text-gray-500"><?php echo $activity['description']; ?></p>
+                                        </div>
+                                        <div class="ml-4 flex-shrink-0">
+                                            <p class="text-sm text-gray-500"><?php echo $formattedTime; ?></p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="ml-4 flex-shrink-0">
-                                    <p class="text-sm text-gray-500">Today, 10:30 AM</p>
-                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="px-4 py-4 sm:px-6 text-center text-gray-500">
+                                No recent activities found.
                             </div>
-                        </div>
-                        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-green-600 truncate">New task assigned</p>
-                                    <p class="text-sm text-gray-500">Department meeting preparation</p>
-                                </div>
-                                <div class="ml-4 flex-shrink-0">
-                                    <p class="text-sm text-gray-500">Today, 9:15 AM</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                            <div class="flex items-center">
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium text-green-600 truncate">Reminder</p>
-                                    <p class="text-sm text-gray-500">Document submission deadline tomorrow</p>
-                                </div>
-                                <div class="ml-4 flex-shrink-0">
-                                    <p class="text-sm text-gray-500">Yesterday, 4:45 PM</p>
-                                </div>
-                            </div>
-                        </div>
+                            <?php
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
