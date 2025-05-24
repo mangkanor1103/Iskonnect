@@ -52,6 +52,14 @@ $username = $_SESSION['username'];
                         <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Approved Students</span>
                     </a>
                 </li>
+                                <li class="group">
+                    <a href="reject.php" class="flex items-center p-3 rounded-lg bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
+                        <svg class="w-5 h-5 text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="ml-3 text-gray-700 group-hover:text-red-700 font-medium">Rejected Students</span>
+                    </a>
+                </li>
                 <li class="border-t border-gray-100 my-2 pt-2"></li>
                 <li class="group">
                     <a href="../logout.php" class="flex items-center p-3 rounded-lg hover:bg-red-50 transition-all duration-300">
