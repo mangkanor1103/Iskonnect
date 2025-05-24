@@ -231,8 +231,8 @@ $conn->close();
                                 </button>
                             </div>
                         </div>
-                        <div class="md:w-1/2 bg-green-100 p-8 flex items-center justify-center">
-                            <lottie-player src="https://assets4.lottiefiles.com/packages/lf20_nR9FL9.json" background="transparent" speed="1" class="w-full max-w-sm" autoplay loop></lottie-player>
+                        <div class="md:w-1/2 p-8 flex items-center justify-center">
+                            
                         </div>
                     </div>
                 </div>
