@@ -78,15 +78,13 @@ $user = $stmt->get_result()->fetch_assoc();
                 </div>
             </div>
         </div>
-    </div>
-
-        <!-- Main content -->
+    </div>        <!-- Main content -->
         <div class="main-content flex-1 overflow-y-auto">
             <!-- Dashboard content -->
             <div class="p-6">
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome, <?= htmlspecialchars($username) ?>!</h2>
-                    <p class="text-gray-600">Here's your academic overview for this semester.</p>
+                    <p class="text-gray-600">Here's your scholarship overview.</p>
                 </div>
                 
                 <!-- Scholarship Alert Section -->
@@ -111,436 +109,109 @@ $user = $stmt->get_result()->fetch_assoc();
                         </div>
                     </div>
                 </div>
-                
-                <!-- Important Announcements -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Important Announcements</h3>
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div class="divide-y divide-gray-200">
-                            <div class="p-5 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
-                                        <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h4 class="text-base font-medium text-gray-900">Midterm Examination Schedule Released</h4>
-                                        <p class="mt-1 text-sm text-gray-500">The midterm examination schedule for Spring 2025 has been released. Please check your student portal for details.</p>
-                                        <p class="mt-2 text-xs text-gray-400">May 22, 2025</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-5 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
-                                        <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h4 class="text-base font-medium text-gray-900">University Foundation Day Activities</h4>
-                                        <p class="mt-1 text-sm text-gray-500">Join us for the University Foundation Day celebrations on June 5, 2025. Various activities will be held across campus.</p>
-                                        <p class="mt-2 text-xs text-gray-400">May 18, 2025</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-5 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
-                                        <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h4 class="text-base font-medium text-gray-900">Course Registration for Summer 2025</h4>
-                                        <p class="mt-1 text-sm text-gray-500">Course registration for Summer 2025 begins on June 1. Please ensure all outstanding balances are settled before registration.</p>
-                                        <p class="mt-2 text-xs text-gray-400">May 15, 2025</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 px-5 py-3">
-                            <a href="#" class="text-sm font-medium text-green-600 hover:text-green-700">View all announcements</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="card bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Available Scholarships Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
                         <div class="flex items-center">
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                            <div class="bg-blue-100 rounded-full p-3 mr-4">
+                                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                 </svg>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-gray-500 text-sm">Available Scholarships</h3>
-                                <p class="text-2xl font-semibold">8</p>
+                            <div>
+                                <p class="text-gray-500 text-sm">Available Scholarships</p>
+                                <?php
+                                // Count total available scholarships
+                                $availableQuery = $conn->query("SELECT COUNT(*) as total FROM scholarship_posts");
+                                $availableCount = $availableQuery->fetch_assoc()['total'];
+                                ?>
+                                <h3 class="text-2xl font-bold text-gray-800"><?= $availableCount ?></h3>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="card bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                    <!-- Upcoming Deadlines Card -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
                         <div class="flex items-center">
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-gray-500 text-sm">Applied Scholarships</h3>
-                                <p class="text-2xl font-semibold">2</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
-                        <div class="flex items-center">
-                            <div class="bg-yellow-100 p-3 rounded-full">
-                                <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div class="bg-yellow-100 rounded-full p-3 mr-4">
+                                <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-gray-500 text-sm">Upcoming Deadlines</h3>
-                                <p class="text-2xl font-semibold">3</p>
+                            <div>
+                                <p class="text-gray-500 text-sm">Upcoming Deadlines</p>
+                                <?php
+                                // Count scholarships with deadlines in the next 7 days
+                                $currentDate = date('Y-m-d');
+                                $nextWeek = date('Y-m-d', strtotime('+7 days'));
+                                $upcomingQuery = $conn->prepare("SELECT COUNT(*) as total FROM scholarship_posts WHERE deadline BETWEEN ? AND ?");
+                                $upcomingQuery->bind_param("ss", $currentDate, $nextWeek);
+                                $upcomingQuery->execute();
+                                $upcomingCount = $upcomingQuery->get_result()->fetch_assoc()['total'];
+                                ?>
+                                <h3 class="text-2xl font-bold text-gray-800"><?= $upcomingCount ?></h3>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="card bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
-                        <div class="flex items-center">
-                            <div class="bg-purple-100 p-3 rounded-full">
-                                <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-gray-500 text-sm">Active Awards</h3>
-                                <p class="text-2xl font-semibold">1</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 
-                <!-- Main Dashboard Widgets -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Upcoming Scholarship Deadlines -->
-                    <div class="card bg-white rounded-lg shadow col-span-1">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Deadlines</h3>
-                            <div class="divide-y">
-                                <div class="py-3">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <p class="font-medium text-gray-800">Financial Assistantship</p>
-                                            <p class="text-sm text-gray-500">University Merit Scholarship</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-red-500 text-sm">Due Tomorrow</p>
-                                            <p class="text-xs text-gray-400">11:59 PM</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="py-3">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <p class="font-medium text-gray-800">Student Assistantship Program</p>
-                                            <p class="text-sm text-gray-500">Library Assistant Position</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-orange-500 text-sm">May 28, 2025</p>
-                                            <p class="text-xs text-gray-400">5:00 PM</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="py-3">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <p class="font-medium text-gray-800">External Scholarship</p>
-                                            <p class="text-sm text-gray-500">Community Foundation Grant</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-gray-500 text-sm">June 5, 2025</p>
-                                            <p class="text-xs text-gray-400">11:59 PM</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="scholarship_posts.php" class="block text-center text-sm text-green-600 hover:underline mt-4">View All Scholarships</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Application Status -->
-                    <div class="card bg-white rounded-lg shadow col-span-1">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">My Applications</h3>
-                            <div class="space-y-4">
-                                <div class="border border-gray-200 rounded-md p-3">
-                                    <div class="flex justify-between mb-1">
-                                        <span class="text-sm font-medium">Academic Excellence Grant</span>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Approved
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-gray-500">Financial Assistantship</p>
-                                    <p class="text-xs text-gray-500 mt-1">Applied: March 15, 2025</p>
-                                </div>
-                                <div class="border border-gray-200 rounded-md p-3">
-                                    <div class="flex justify-between mb-1">
-                                        <span class="text-sm font-medium">Research Assistant Position</span>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Pending
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-gray-500">Student Assistantship Program</p>
-                                    <p class="text-xs text-gray-500 mt-1">Applied: May 10, 2025</p>
-                                </div>
-                                <div class="border border-gray-200 rounded-md p-3">
-                                    <div class="flex justify-between mb-1">
-                                        <span class="text-sm font-medium">Needs-Based Financial Aid</span>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                            Not Started
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-gray-500">Financial Assistantship</p>
-                                    <p class="text-xs text-gray-500 mt-1">Deadline: June 15, 2025</p>
-                                </div>
-                            </div>
-                            <a href="#" class="block text-center text-sm text-green-600 hover:underline mt-4">Manage Applications</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Scholarship Distribution Chart -->
-                    <div class="card bg-white rounded-lg shadow col-span-1">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Scholarship Types</h3>
-                            <div class="relative" style="height: 250px;">
-                                <canvas id="scholarshipChart"></canvas>
-                            </div>
-                            <div class="text-center mt-4">
-                                <p class="text-sm text-gray-500">Available scholarship distribution by type</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Weekly Schedule -->
-                <div class="mt-8">
-                    <div class="card bg-white rounded-lg shadow">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">This Week's Schedule</h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monday</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tuesday</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wednesday</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thursday</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Friday</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8:00 - 9:30</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-blue-100 text-blue-800 py-1 px-2 rounded text-xs">Math 101</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-blue-100 text-blue-800 py-1 px-2 rounded text-xs">Math 101</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-blue-100 text-blue-800 py-1 px-2 rounded text-xs">Math 101</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10:00 - 11:30</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-green-100 text-green-800 py-1 px-2 rounded text-xs">CS 201</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-purple-100 text-purple-800 py-1 px-2 rounded text-xs">Psych 101</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-green-100 text-green-800 py-1 px-2 rounded text-xs">CS 201</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-purple-100 text-purple-800 py-1 px-2 rounded text-xs">Psych 101</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1:00 - 2:30</td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-yellow-100 text-yellow-800 py-1 px-2 rounded text-xs">Eng Comp</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-yellow-100 text-yellow-800 py-1 px-2 rounded text-xs">Eng Comp</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3:00 - 5:30</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-red-100 text-red-800 py-1 px-2 rounded text-xs">Chem Lab</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="bg-red-100 text-red-800 py-1 px-2 rounded text-xs">Chem Lab</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                            <td class="px-6 py-4 whitespace-nowrap"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Scholarship Resources -->
-                <div class="mt-8">
-                    <div class="card bg-white rounded-lg shadow">
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Scholarship Resources</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div class="border border-gray-200 rounded-md p-4 hover:bg-green-50 transition-colors">
-                                    <div class="flex items-start">
-                                        <div class="bg-blue-100 p-2 rounded-full">
-                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">Application Guidelines</h4>
-                                            <p class="mt-1 text-xs text-gray-500">Learn how to properly complete scholarship applications</p>
-                                            <a href="#" class="mt-2 text-xs text-green-600 hover:text-green-700 inline-flex items-center">
-                                                Download PDF
-                                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="border border-gray-200 rounded-md p-4 hover:bg-green-50 transition-colors">
-                                    <div class="flex items-start">
-                                        <div class="bg-green-100 p-2 rounded-full">
-                                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">Essay Writing Tips</h4>
-                                            <p class="mt-1 text-xs text-gray-500">Get helpful tips for writing scholarship essays</p>
-                                            <a href="#" class="mt-2 text-xs text-green-600 hover:text-green-700 inline-flex items-center">
-                                                View Guide
-                                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="border border-gray-200 rounded-md p-4 hover:bg-green-50 transition-colors">
-                                    <div class="flex items-start">
-                                        <div class="bg-yellow-100 p-2 rounded-full">
-                                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">Scholarship Calendar</h4>
-                                            <p class="mt-1 text-xs text-gray-500">View upcoming scholarship deadlines</p>
-                                            <a href="#" class="mt-2 text-xs text-green-600 hover:text-green-700 inline-flex items-center">
-                                                Open Calendar
-                                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="border border-gray-200 rounded-md p-4 hover:bg-green-50 transition-colors">
-                                    <div class="flex items-start">
-                                        <div class="bg-red-100 p-2 rounded-full">
-                                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">Common Mistakes</h4>
-                                            <p class="mt-1 text-xs text-gray-500">Learn what to avoid in your applications</p>
-                                            <a href="#" class="mt-2 text-xs text-green-600 hover:text-green-700 inline-flex items-center">
-                                                Read Article
-                                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="border border-gray-200 rounded-md p-4 hover:bg-green-50 transition-colors">
-                                    <div class="flex items-start">
-                                        <div class="bg-purple-100 p-2 rounded-full">
-                                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">FAQ</h4>
-                                            <p class="mt-1 text-xs text-gray-500">Find answers to common scholarship questions</p>
-                                            <a href="#" class="mt-2 text-xs text-green-600 hover:text-green-700 inline-flex items-center">
-                                                View FAQ
-                                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="border border-gray-200 rounded-md p-4 hover:bg-green-50 transition-colors">
-                                    <div class="flex items-start">
-                                        <div class="bg-indigo-100 p-2 rounded-full">
-                                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h4 class="text-sm font-medium text-gray-900">Contact Support</h4>
-                                            <p class="mt-1 text-xs text-gray-500">Get help with scholarship applications</p>
-                                            <a href="#" class="mt-2 text-xs text-green-600 hover:text-green-700 inline-flex items-center">
-                                                Contact Us
-                                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             
-            <!-- Footer -->
-            <footer class="bg-white p-6 border-t">
-                <div class="text-center text-sm text-gray-500">
-                    <p>&copy; 2025 Iskonnect. All rights reserved.</p>
+            <!-- Recent Scholarship Posts Section -->
+            <div class="mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Recent Scholarship Posts</h3>
+                    </div>
+                    
+                    <?php
+                    // Fetch recent scholarship posts
+                    $stmt = $conn->prepare("SELECT id, title, scholarship_type, deadline FROM scholarship_posts ORDER BY created_at DESC LIMIT 3");
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    if ($result->num_rows > 0) {
+                        echo '<div class="space-y-4">';
+                        while($row = $result->fetch_assoc()) {
+                            // Calculate days remaining until deadline
+                            $deadline = new DateTime($row['deadline']);
+                            $today = new DateTime();
+                            $days_remaining = $today->diff($deadline)->days;
+                            
+                            // Determine urgency class based on days remaining
+                            $urgency_class = '';
+                            if ($days_remaining <= 3) {
+                                $urgency_class = 'bg-red-50 border-red-200 text-red-700';
+                            } else if ($days_remaining <= 7) {
+                                $urgency_class = 'bg-yellow-50 border-yellow-200 text-yellow-700';
+                            } else {
+                                $urgency_class = 'bg-green-50 border-green-200 text-green-700';
+                            }
+                            
+                            echo '
+                            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div class="flex justify-between">
+                                    <h4 class="font-medium text-gray-800">'.htmlspecialchars($row['title']).'</h4>
+                                    <span class="px-2 py-1 rounded text-xs '.$urgency_class.'">
+                                        '.$days_remaining.' days left
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Type: '.htmlspecialchars($row['scholarship_type']).'</p>
+                            </div>
+                            ';
+                        }
+                        echo '</div>';
+                    } else {
+                        echo '<p class="text-gray-500">No scholarship posts available at the moment.</p>';
+                    }
+                    ?>
                 </div>
-            </footer>
+            </div>
+            
         </div>
     </div>
     
@@ -559,19 +230,18 @@ $user = $stmt->get_result()->fetch_assoc();
                     }
                 });
             }
-            
-            // Initialize scholarship distribution chart
+              // Initialize scholarship distribution chart
             const ctx = document.getElementById('scholarshipChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Financial Assistantship', 'Student Assistantship', 'Both', 'External'],
+                    labels: ['Financial Assistantship', 'Student Assistantship', 'Merit-Based', 'External'],
                     datasets: [{
-                        data: [4, 2, 1, 1],
+                        data: [5, 3, 2, 1],
                         backgroundColor: [
                             '#3B82F6', // Blue for Financial
                             '#10B981', // Green for Student Assistantship
-                            '#8B5CF6', // Purple for Both
+                            '#8B5CF6', // Purple for Merit-Based
                             '#F59E0B'  // Yellow for External
                         ],
                         hoverOffset: 4

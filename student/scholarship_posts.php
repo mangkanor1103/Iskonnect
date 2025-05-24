@@ -201,6 +201,14 @@ $posts = $stmt->get_result();
                                             </div>
                                         <?php endif; ?>
                                     </div>
+                                    
+                                    <!-- Add bottom View Details button -->
+                                    <a href="view_scholarship.php?id=<?php echo $post['id']; ?>" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-md shadow-sm transition-colors">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        View Details
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -221,13 +229,6 @@ $posts = $stmt->get_result();
                 </div>
             <?php endif; ?>
         </div>
-        
-        <!-- Footer -->
-        <footer class="bg-white p-6 border-t">
-            <div class="text-center text-sm text-gray-500">
-                <p>&copy; 2025 Iskonnect. All rights reserved.</p>
-            </div>
-        </footer>
     </div>
 </div>
 
