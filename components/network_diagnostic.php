@@ -22,7 +22,7 @@ $server_info = array(
 );
 
 // Only use the specific IP address (192.168.101.78)
-$server_ips = array("192.168.92.10");
+$server_ips = array("192.168.101.78");
 
 // Check folder case sensitivity
 $folder_exists = array(

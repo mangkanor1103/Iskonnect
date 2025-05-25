@@ -9,7 +9,7 @@ include '../components/conn.php';
 $username = $_SESSION['username'];
 
 // IP address for local network access
-$server_ip = "192.168.92.10";
+$server_ip = "192.168.101.78";
 $form_url = "http://$server_ip/iskonnect/students.php";
 
 // Add network check JavaScript function
@@ -51,8 +51,7 @@ $network_check_js = "
     <header class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
-                <h1 class="text-lg font-semibold text-gray-900">Application Form QR Code</h1>
-                <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-semibold text-gray-900">Application Form QR Code</h1>                <div class="flex items-center space-x-4">
                     <a href="dashboard.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         Back to Dashboard
                     </a>
@@ -61,6 +60,12 @@ $network_check_js = "
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                         </svg>
                         Print QR Code
+                    </button>
+                    <button id="download-pdf" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download as PDF
                     </button>
                 </div>
             </div>
@@ -82,7 +87,7 @@ $network_check_js = "
                 </div>
                 
                 <div id="network-message" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-center hidden">
-                    <p class="text-sm text-red-600">Warning: Users must be connected to the same network (192.168.92.10) to access the form.</p>
+                    <p class="text-sm text-red-600">Warning: Users must be connected to the same network (192.168.101.78) to access the form.</p>
                 </div>
                   <!-- QR Code Image -->
                 <div id="qr-container">
@@ -144,6 +149,15 @@ $network_check_js = "
     /* Hide network status elements when printing */
     #network-status, #network-message {
         display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Ensure QR code is visible */
+    .qr-image {
+        display: block !important;
+        visibility: visible !important;
+        width: 350px !important;
+        height: 350px !important;
     }
     
     .qr-container {
@@ -152,54 +166,126 @@ $network_check_js = "
 }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
 <script>
-<?php echo $network_check_js; ?>
+    <?php echo $network_check_js; ?>
 
-// QR code handling
-document.addEventListener('DOMContentLoaded', function () {
-    const qrImg = document.querySelector('.qr-image');
+    // Simplified QR code handling
+    document.addEventListener('DOMContentLoaded', function () {
+        const qrImg = document.querySelector('.qr-image');
 
-    // Handle QR image error
-    qrImg.onerror = function () {
-        console.error('QR code failed to load');
-        // Try to reload with a different parameter to avoid cache issues
-        qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?data=<?php echo urlencode($form_url); ?>&size=300x300&margin=10&t=" + new Date().getTime();
-    };
-    
-    // Test direct URL access
-    function testUrlAccess(url) {
-        const testImg = new Image();
-        testImg.onload = function () {
-            console.log('URL appears to be accessible: ' + url);
+        // Handle QR image error
+        qrImg.onerror = function () {
+            console.error('QR code failed to load');
         };
-        testImg.onerror = function () {
-            console.warn('URL might not be accessible: ' + url);
-        };
-        // Add a small random parameter to prevent caching
-        testImg.src = url + '?test=' + Math.random();
-    }
-    
-    // Test URL after a short delay
-    setTimeout(function () {
-        testUrlAccess('<?php echo $form_url; ?>');
-    }, 1000);
-});
+        
+        // PDF download functionality
+        const downloadPdfBtn = document.getElementById('download-pdf');
+        if (downloadPdfBtn) {
+            downloadPdfBtn.addEventListener('click', function() {
+                // Show loading indicator
+                const originalText = this.innerHTML;
+                this.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating PDF...
+                `;
+                
+                // Wait for libraries to load
+                if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+                    alert('PDF generation libraries are still loading. Please try again in a moment.');
+                    this.innerHTML = originalText;
+                    return;
+                }
+                
+                // Get the section to convert to PDF
+                const printSection = document.querySelector('.print-section');
+                
+                // Temporarily hide network status elements
+                const networkStatus = document.getElementById('network-status');
+                const networkMessage = document.getElementById('network-message');
+                
+                // Save original display states
+                const networkStatusDisplay = networkStatus.style.display;
+                const networkMessageDisplay = networkMessage.style.display;
+                
+                // Hide network elements for PDF
+                networkStatus.style.display = 'none';
+                networkMessage.style.display = 'none';
+                
+                // Use html2canvas to capture the content
+                html2canvas(printSection, {
+                    scale: 2, // Higher scale for better quality
+                    useCORS: true, // Enable CORS for images from different domains
+                    logging: false
+                }).then(canvas => {
+                    // Restore network elements display after canvas capture
+                    networkStatus.style.display = networkStatusDisplay;
+                    networkMessage.style.display = networkMessageDisplay;
+                    
+                    const { jsPDF } = window.jspdf;
+                    
+                    // Create PDF instance (A4 size)
+                    const pdf = new jsPDF('portrait', 'mm', 'a4');
+                    
+                    // Get canvas dimensions
+                                        // Get canvas dimensions
+                    const imgWidth = 210; // A4 width in mm (210mm)
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    
+                    // Add the canvas as image with proper centering
+                    const imgData = canvas.toDataURL('image/png');
+                    
+                    // Calculate vertical position to center on page
+                    const yPosition = Math.max(0, (pageHeight - imgHeight) / 2);
+                    
+                    // Add the image centered with a slight adjustment to avoid cutting off content at bottom
+                    pdf.addImage(imgData, 'PNG', 0, yPosition * 0.7, imgWidth, imgHeight * 0.9);
+                    
+                    
+                    
+                    // Save the PDF
+                    pdf.save('application_form_qr_code.pdf');
+                    
+                    // Restore button text
+                    this.innerHTML = originalText;
+                }).catch(err => {
+                    // Restore network elements display in case of error
+                    networkStatus.style.display = networkStatusDisplay;
+                    networkMessage.style.display = networkMessageDisplay;
+                    
+                    console.error('Error generating PDF:', err);
+                    alert('Error generating PDF. Please try again.');
+                    this.innerHTML = originalText;
+                });
+            });
+        }
 
-// Function to update QR code with a specific URL if needed
-function updateQrWithUrl(url) {
-    // Update QR code
-    const qrContainer = document.getElementById('qr-container');
-    qrContainer.innerHTML = `
-    <img 
-        src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=300x300&margin=10" 
-        alt="Custom URL QR Code" 
-        class="qr-image border-4 border-green-100 rounded-lg shadow-lg"
-    />
-    `;
+        // Existing code for trying alternative URL formats
+        const tryAltBtn = document.getElementById('tryAltBtn');
+        if (typeof tryAltBtn !== 'undefined' && tryAltBtn) {
+            tryAltBtn.addEventListener('click', function () {
+                if (usingAltUrl) {
+                    qrImg.classList.remove('hidden');
+                    qrImgAlt.classList.add('hidden');
+                    currentUrlDisplay.textContent = urlMain;
+                    altUrlDisplay.textContent = urlMain;
+                    tryAltBtn.textContent = 'Try alternative URL format';
+                    usingAltUrl = false;
+                } else {
+                    switchToAltQr();
+                }
+            });
+        }
 
-    // Update displayed URL
-    document.getElementById('current-url').textContent = url;
-}
+        // Rest of your existing code
+        // ...
+    });
 </script>
 
 <?php include '../components/footer.php'; ?>

@@ -3,7 +3,7 @@ include 'components/header.php';
 include 'components/conn.php';
 
 // Network access check - restricts access only to local network users
-$server_ip = "192.168.92.10";
+$server_ip = "192.168.101.78";
 $client_ip = $_SERVER['REMOTE_ADDR'];
 
 function isOnSameNetwork($client_ip, $server_ip) {

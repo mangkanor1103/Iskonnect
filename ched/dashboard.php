@@ -9,7 +9,7 @@ include '../components/conn.php';
 $username = $_SESSION['username'];
 
 // IP address for local network access
-$server_ip = "192.168.92.10";
+$server_ip = "192.168.101.78";
 $form_url = "http://$server_ip/iskonnect/students.php";
 
 // Add network check JavaScript function
