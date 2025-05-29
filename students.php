@@ -1,9 +1,13 @@
-<?php 
+<?php
 include 'components/header.php'; 
 include 'components/conn.php';
 
-// Network access check - restricts access only to local network users
-$server_ip = "192.168.101.78";
+// Detect if running locally or online
+$is_localhost = in_array($_SERVER['SERVER_ADDR'], ['127.0.0.1', '::1', '192.168.101.78']) || 
+                strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+
+// Always allow access regardless of network when online
+$server_ip = "192.168.101.78"; // Keep for backward compatibility
 $client_ip = $_SERVER['REMOTE_ADDR'];
 
 function isOnSameNetwork($client_ip, $server_ip) {
@@ -17,21 +21,30 @@ function isOnSameNetwork($client_ip, $server_ip) {
             $client_parts[2] == $server_parts[2]);
 }
 
-// Only allow if the client is on the same network as the server
-$same_network = isOnSameNetwork($client_ip, $server_ip);
-
-// Variable to determine if we should display access warning
+// Only check network restrictions if we're running locally
+$same_network = false;
+$allowed_access = true; // Default to allowed access for online deployment
 $show_warning = false;
 
-// If IP is localhost/127.0.0.1, it's a direct server access (development mode)
-// OR if they're on the same network subnet
-$allowed_access = ($client_ip == "127.0.0.1" || $client_ip == "::1" || $same_network);
-
-// If access is not allowed, show warning
-if (!$allowed_access) {
-    $show_warning = true;
+if ($is_localhost) {
+    // Local environment - check network
+    $same_network = isOnSameNetwork($client_ip, $server_ip);
+    
+    // If IP is localhost/127.0.0.1, it's a direct server access (development mode)
+    // OR if they're on the same network subnet
+    $allowed_access = ($client_ip == "127.0.0.1" || $client_ip == "::1" || $same_network);
+    
+    // If access is not allowed, show warning
+    if (!$allowed_access) {
+        $show_warning = true;
+    }
+} else {
+    // When online, always allow access
+    $allowed_access = true;
+    $show_warning = false;
 }
 
+// Rest of your existing code
 // Check if form is submitted and process the form data
 if(isset($_POST['submit_application'])) {
     // Process photo upload

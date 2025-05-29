@@ -1,4 +1,4 @@
-<?php 
+<?php
 include '../components/session_check.php';
 
 // Check if user is logged in and has ched role
@@ -8,15 +8,19 @@ include '../components/conn.php';
 
 $username = $_SESSION['username'];
 
-// IP address for local network access
-$server_ip = "192.168.101.78";
-$form_url = "http://$server_ip/iskonnect/students.php";
+// Detect if running locally or online
+$is_localhost = in_array($_SERVER['SERVER_ADDR'], ['127.0.0.1', '::1', '192.168.101.78']) || 
+                strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+
+// Always use https:// server_name format for consistency across environments
+$server_name = $_SERVER['HTTP_HOST'];
+$form_url = "https://$server_name/students.php";
 
 // Add network check JavaScript function
 $network_check_js = "
     function checkNetwork() {
         // Create a unique endpoint with timestamp to avoid caching
-        const testEndpoint = 'http://$server_ip/iskonnect/components/network_check.php?t=' + new Date().getTime();
+        const testEndpoint = 'https://$server_name/components/network_check.php?t=' + new Date().getTime();
         
         return fetch(testEndpoint, { 
             mode: 'no-cors',
@@ -24,12 +28,12 @@ $network_check_js = "
             timeout: 2000
         })
         .then(() => {
-            document.getElementById('network-status').innerHTML = '<span class=\"bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Connected to network</span>';
+            document.getElementById('network-status').innerHTML = '<span class=\"bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Connected to server</span>';
             document.getElementById('network-message').classList.add('hidden');
             return true;
         })
         .catch(() => {
-            document.getElementById('network-status').innerHTML = '<span class=\"bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Not on the same network</span>';
+            document.getElementById('network-status').innerHTML = '<span class=\"bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Cannot connect to server</span>';
             document.getElementById('network-message').classList.remove('hidden');
             return false;
         });
