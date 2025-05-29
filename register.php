@@ -25,15 +25,21 @@ if (isset($_SESSION['user_id'])) {
 include 'components/conn.php';
 
 // Initialize variables for form data and errors
-$username = $password = '';
+$fullname = $username = $password = '';
 $errors = [];
 
 // Process registration form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
+    $fullname = trim($_POST['fullname']);
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
+    
+    // Validate full name
+    if (empty($fullname)) {
+        $errors['fullname'] = 'Full name is required';
+    }
     
     // Validate username
     if (empty($username)) {
@@ -41,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($username) < 3) {
         $errors['username'] = 'Username must be at least 3 characters';
     } else {
-        // Check if username already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -73,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role = 'student';
         
         // Insert new user
-        $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $hashed_password, $role);
+        $stmt = $conn->prepare("INSERT INTO users (fullname, username, password, role) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $fullname, $username, $hashed_password, $role);
         
         if ($stmt->execute()) {
             // Get the new user ID
@@ -83,8 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Set session variables
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
+            $_SESSION['fullname'] = $fullname;
             $_SESSION['role'] = $role;
-              // Return JSON response for AJAX
+            
+            // Return JSON response for AJAX
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
@@ -208,6 +215,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <form id="registerForm" class="space-y-4">
                     <div class="register-error text-red-500 text-center text-sm hidden"></div>
+                    
+                    <div>
+                        <label for="fullname" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" name="fullname" id="fullname" class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500" placeholder="Enter your full name" required>
+                        <p class="error-fullname text-red-500 text-xs mt-1 hidden"></p>
+                    </div>
                     
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>

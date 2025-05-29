@@ -22,7 +22,19 @@ $error_message = "";
 if(isset($_POST['submit_post'])) {
     $title = mysqli_real_escape_string($conn, $_POST['title']);
     $content = mysqli_real_escape_string($conn, $_POST['content']);
-    $scholarship_type = mysqli_real_escape_string($conn, $_POST['scholarship_type']);
+    
+    // Normalize line endings to ensure consistent behavior across platforms
+    $how_to_apply = str_replace('\n', "\n", $_POST['how_to_apply']); // Replace literal \n with actual newlines
+    $how_to_apply = str_replace("\r\n", "\n", $how_to_apply); // Normalize Windows line endings
+    $how_to_apply = mysqli_real_escape_string($conn, $how_to_apply);
+    
+    // Handle scholarship type (regular or custom)
+    if($_POST['scholarship_type'] == 'custom' && !empty($_POST['custom_scholarship_type'])) {
+        $scholarship_type = mysqli_real_escape_string($conn, $_POST['custom_scholarship_type']);
+    } else {
+        $scholarship_type = mysqli_real_escape_string($conn, $_POST['scholarship_type']);
+    }
+    
     $validity_date = mysqli_real_escape_string($conn, $_POST['validity_date']); // Add this line
     
     // Process attachment upload
@@ -49,11 +61,11 @@ if(isset($_POST['submit_post'])) {
         $error_message = "Invalid user session. Please log out and log in again.";
     } else {
         // Insert post into database - ensure posted_by is correctly typed as integer
-        $query = "INSERT INTO scholarship_posts (title, content, scholarship_type, posted_by, attachment, deadline) 
-                VALUES (?, ?, ?, ?, ?, ?)"; // Updated to use deadline instead of validity_date
+        $query = "INSERT INTO scholarship_posts (title, content, scholarship_type, posted_by, attachment, deadline, how_to_apply) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)"; // Added how_to_apply field
         
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssiss", $title, $content, $scholarship_type, $user_id, $attachment_name, $validity_date);
+        $stmt->bind_param("sssisss", $title, $content, $scholarship_type, $user_id, $attachment_name, $validity_date, $how_to_apply);
         
         if($stmt->execute()) {
             $success_message = "Post created successfully!";
@@ -102,23 +114,7 @@ $posts_result = $posts_stmt->get_result();
                         <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Pending Students</span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a href="approved.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
-                        <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Approved Students</span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a href="reject.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
-                        <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="ml-3 text-gray-700 group-hover:text-red-700 font-medium">Rejected Students</span>
+                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Applicants</span>
                     </a>
                 </li>
                 <li class="group">
@@ -175,60 +171,109 @@ $posts_result = $posts_stmt->get_result();
         </div>
         
         <!-- Create Post Form -->
-        <div class="p-6">
+        <div class="p-6 max-w-5xl mx-auto">
             <?php if(!empty($success_message)): ?>
-                <div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
-                    <p><?php echo $success_message; ?></p>
+                <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm">
+                    <div class="flex">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p><?php echo $success_message; ?></p>
+                    </div>
                 </div>
             <?php endif; ?>
             
             <?php if(!empty($error_message)): ?>
-                <div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                    <p><?php echo $error_message; ?></p>
+                <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm">
+                    <div class="flex">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p><?php echo $error_message; ?></p>
+                    </div>
                 </div>
             <?php endif; ?>
             
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
-                <form method="post" enctype="multipart/form-data" class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Create New Scholarship Post</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Post Title *</label>
-                            <input type="text" name="title" id="title" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+                <div class="px-8 py-6 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-lg font-semibold text-gray-800">Create New Scholarship Post</h3>
+                    <p class="text-sm text-gray-500 mt-1">Fill in the details below to create a new scholarship opportunity</p>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+                    <!-- Title and Type Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label for="title" class="block text-sm font-medium text-gray-700">Post Title <span class="text-red-500">*</span></label>
+                            <input type="text" name="title" id="title" required 
+                                class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500">
                         </div>
                         
-                        <div>
-                            <label for="scholarship_type" class="block text-sm font-medium text-gray-700 mb-1">Scholarship Type</label>
-                            <select name="scholarship_type" id="scholarship_type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                        <div class="space-y-2">
+                            <label for="scholarship_type" class="block text-sm font-medium text-gray-700">Scholarship Type</label>
+                            <select name="scholarship_type" id="scholarship_type" 
+                                class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                                onchange="checkCustomType()">
                                 <option value="">-- Select Type --</option>
                                 <option value="Financial Assistantship">Financial Assistantship</option>
                                 <option value="Student Assistantship Program">Student Assistantship Program</option>
+                                <option value="Both">Both Types</option>
+                                <option value="custom">Other (specify)</option>
                             </select>
+                            
+                            <div id="custom_type_container" class="mt-3 hidden">
+                                <input type="text" name="custom_scholarship_type" id="custom_scholarship_type" 
+                                    placeholder="Enter custom scholarship type" 
+                                    class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="mb-6">
-                        <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Post Content *</label>
-                        <textarea name="content" id="content" rows="8" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"></textarea>
-                        <p class="mt-1 text-xs text-gray-500">Provide detailed information about the scholarship opportunity.</p>
+                    <!-- Content Section -->
+                    <div class="space-y-2">
+                        <label for="content" class="block text-sm font-medium text-gray-700">Post Content <span class="text-red-500">*</span></label>
+                        <textarea name="content" id="content" rows="8" required 
+                            class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+                        <p class="text-xs text-gray-500 italic">Provide detailed information about the scholarship opportunity including eligibility requirements and benefits.</p>
                     </div>
                     
-                    <div class="mb-6">
-                        <label for="attachment" class="block text-sm font-medium text-gray-700 mb-1">Attachment (Optional)</label>
-                        <input type="file" name="attachment" id="attachment" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
-                        <p class="mt-1 text-xs text-gray-500">Upload related documents (PDF, Word, etc.)</p>
+                    <!-- How to Apply Section -->
+                    <div class="space-y-2">
+                        <label for="how_to_apply" class="block text-sm font-medium text-gray-700">How to Apply</label>
+                        <textarea name="how_to_apply" id="how_to_apply" rows="4" 
+                            class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+                        <p class="text-xs text-gray-500 italic">Provide step-by-step instructions for students on how to apply for this scholarship.</p>
                     </div>
                     
-                    <div class="mb-6">
-                        <label for="validity_date" class="block text-sm font-medium text-gray-700 mb-1">Validity Date *</label>
-                        <input type="date" name="validity_date" id="validity_date" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
-                        <p class="mt-1 text-xs text-gray-500">Select the date until the scholarship is valid.</p>
+                    <!-- File and Date Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label for="attachment" class="block text-sm font-medium text-gray-700">Attachment</label>
+                            <div class="flex items-center">
+                                <label class="w-full flex items-center justify-center px-4 py-2.5 bg-white border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-50">
+                                    <svg class="mr-2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                    </svg>
+                                    <span class="text-sm text-gray-600">Choose file</span>
+                                    <input type="file" name="attachment" id="attachment" class="hidden">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 italic">Upload related documents (PDF, Word, etc.)</p>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label for="validity_date" class="block text-sm font-medium text-gray-700">Application Deadline <span class="text-red-500">*</span></label>
+                            <input type="date" name="validity_date" id="validity_date" required 
+                                class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <p class="text-xs text-gray-500 italic">Select the final date for application submissions.</p>
+                        </div>
                     </div>
                     
-                    <div class="flex justify-end">
-                        <button type="submit" name="submit_post" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            Publish Post
+                    <!-- Submit Button -->
+                    <div class="pt-4 border-t border-gray-100">
+                        <button type="submit" name="submit_post" 
+                            class="px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                            Publish Scholarship
                         </button>
                     </div>
                 </form>
@@ -251,6 +296,17 @@ $posts_result = $posts_stmt->get_result();
                                         <?php endif; ?>
                                     </p>
                                     <p class="text-gray-700 mt-2"><?php echo nl2br(htmlspecialchars(substr($post['content'], 0, 150))); ?><?php if(strlen($post['content']) > 150) echo '...'; ?></p>
+                                    <?php if(!empty($post['how_to_apply'])): ?>
+                                        <p class="text-sm text-blue-600 mt-2">
+                                            <span class="font-medium">How to Apply:</span> 
+                                            <span class="whitespace-pre-line"><?php 
+                                                // Replace literal "\n" with actual newlines before displaying
+                                                $how_to_apply = str_replace('\n', "\n", $post['how_to_apply']);
+                                                echo htmlspecialchars(substr($how_to_apply, 0, 100)); 
+                                                if(strlen($how_to_apply) > 100) echo '...'; 
+                                            ?></span>
+                                        </p>
+                                    <?php endif; ?>
                                     <?php if(!empty($post['attachment'])): ?>
                                         <p class="text-sm text-green-600 mt-2">
                                             <span class="flex items-center">

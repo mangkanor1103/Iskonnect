@@ -8,22 +8,28 @@ include '../components/conn.php';
 
 $username = $_SESSION['username'];
 
-// Default filter is to show all pending students
+// Default filter is to show all students (not just pending)
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Build the query based on the filter - only show pending students
-$query = "SELECT * FROM students WHERE status = 'Pending'";
+// Build the query based on the filter - show all students
+$query = "SELECT * FROM students";
 
+// Apply scholarship type filter if specified
 if ($filter == 'financial') {
-    $query .= " AND scholarship_type = 'Financial Assistantship'";
+    $query .= " WHERE scholarship_type = 'Financial Assistantship'";
 } elseif ($filter == 'student') {
-    $query .= " AND scholarship_type = 'Student Assistantship Program'";
+    $query .= " WHERE scholarship_type = 'Student Assistantship Program'";
 }
 
-// Add search functionality
+// Add search functionality with proper condition chaining
 if (!empty($search)) {
-    $query .= " AND (last_name LIKE '%$search%' OR first_name LIKE '%$search%' OR student_id LIKE '%$search%')";
+    if (strpos($query, 'WHERE') === false) {
+        $query .= " WHERE";
+    } else {
+        $query .= " AND";
+    }
+    $query .= " (last_name LIKE '%$search%' OR first_name LIKE '%$search%' OR student_id LIKE '%$search%')";
 }
 
 // Execute query
@@ -63,23 +69,7 @@ if (!$result) {
                         <svg class="w-5 h-5 text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Pending Students</span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a href="approved.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
-                        <svg class="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Approved Students</span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a href="reject.php" class="flex items-center p-3 rounded-lg hover:bg-green-50 transition-all duration-300 group-hover:translate-x-1 transform">
-                        <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="ml-3 text-gray-700 group-hover:text-red-700 font-medium">Rejected Students</span>
+                        <span class="ml-3 text-gray-700 group-hover:text-green-700 font-medium">Applicants</span>
                     </a>
                 </li>
                 <li class="group">
@@ -129,7 +119,7 @@ if (!$result) {
         <!-- Top Navigation Bar -->
         <div class="bg-white shadow-sm border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
             <div class="flex items-center">
-                <h2 class="text-xl font-semibold text-gray-800">Pending Students</h2>
+                <h2 class="text-xl font-semibold text-gray-800">Applicants</h2>
                 <div class="ml-4 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Staff</div>
             </div>
             <div class="flex items-center space-x-4">
@@ -153,9 +143,9 @@ if (!$result) {
                 <div class="p-6">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-900">Pending Students Directory</h3>
+                            <h3 class="text-lg font-medium text-gray-900">Applicants Directory</h3>
                             <p class="mt-1 text-sm text-gray-500">
-                                View and manage pending scholarship students
+                                View and manage scholarship applicants
                             </p>
                         </div>
                         <div class="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">

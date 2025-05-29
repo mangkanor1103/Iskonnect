@@ -50,7 +50,15 @@ $post = $post_result->fetch_assoc();
 if(isset($_POST['update_post'])) {
     $title = mysqli_real_escape_string($conn, $_POST['title']);
     $content = mysqli_real_escape_string($conn, $_POST['content']);
-    $scholarship_type = mysqli_real_escape_string($conn, $_POST['scholarship_type']);
+    $how_to_apply = isset($_POST['how_to_apply']) ? mysqli_real_escape_string($conn, $_POST['how_to_apply']) : '';
+    
+    // Handle scholarship type (regular or custom)
+    if(isset($_POST['scholarship_type']) && $_POST['scholarship_type'] == 'custom' && !empty($_POST['custom_scholarship_type'])) {
+        $scholarship_type = mysqli_real_escape_string($conn, $_POST['custom_scholarship_type']);
+    } else {
+        $scholarship_type = mysqli_real_escape_string($conn, $_POST['scholarship_type']);
+    }
+    
     $deadline = !empty($_POST['deadline']) ? mysqli_real_escape_string($conn, $_POST['deadline']) : NULL;
     
     // Process attachment upload if a new file is uploaded
@@ -76,12 +84,11 @@ if(isset($_POST['update_post'])) {
             }
         }
     }
-    
-    // Update post in database - ensure post can only be updated by its owner
-    $update_query = "UPDATE scholarship_posts SET title = ?, content = ?, scholarship_type = ?, attachment = ?, deadline = ? WHERE id = ? AND posted_by = ?";
+      // Update post in database - ensure post can only be updated by its owner
+    $update_query = "UPDATE scholarship_posts SET title = ?, content = ?, scholarship_type = ?, attachment = ?, deadline = ?, how_to_apply = ? WHERE id = ? AND posted_by = ?";
     
     $update_stmt = $conn->prepare($update_query);
-    $update_stmt->bind_param("sssssii", $title, $content, $scholarship_type, $attachment_name, $deadline, $post_id, $user_id);
+    $update_stmt->bind_param("ssssssii", $title, $content, $scholarship_type, $attachment_name, $deadline, $how_to_apply, $post_id, $user_id);
         
     if($update_stmt->execute()) {
         if ($update_stmt->affected_rows > 0) {
@@ -216,15 +223,29 @@ if(isset($_POST['update_post'])) {
                             <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Post Title *</label>
                             <input type="text" name="title" id="title" required value="<?php echo htmlspecialchars($post['title']); ?>" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
-                        
-                        <div>
+                          <div>
                             <label for="scholarship_type" class="block text-sm font-medium text-gray-700 mb-1">Scholarship Type</label>
-                            <select name="scholarship_type" id="scholarship_type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <select name="scholarship_type" id="scholarship_type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" onchange="checkCustomType()">
                                 <option value="">-- Select Type --</option>
                                 <option value="Financial Assistantship" <?php echo ($post['scholarship_type'] == 'Financial Assistantship') ? 'selected' : ''; ?>>Financial Assistantship</option>
                                 <option value="Student Assistantship Program" <?php echo ($post['scholarship_type'] == 'Student Assistantship Program') ? 'selected' : ''; ?>>Student Assistantship Program</option>
                                 <option value="Both" <?php echo ($post['scholarship_type'] == 'Both') ? 'selected' : ''; ?>>Both Types</option>
+                                <option value="custom" <?php echo (!in_array($post['scholarship_type'], ['Financial Assistantship', 'Student Assistantship Program', 'Both', ''])) ? 'selected' : ''; ?>>Other (specify)</option>
                             </select>
+                            <div id="custom_type_container" class="mt-2 <?php echo (!in_array($post['scholarship_type'], ['Financial Assistantship', 'Student Assistantship Program', 'Both', ''])) ? '' : 'hidden'; ?>">
+                                <input type="text" name="custom_scholarship_type" id="custom_scholarship_type" placeholder="Enter custom scholarship type" value="<?php echo (!in_array($post['scholarship_type'], ['Financial Assistantship', 'Student Assistantship Program', 'Both', ''])) ? htmlspecialchars($post['scholarship_type']) : ''; ?>" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            </div>
+                            <script>
+                                function checkCustomType() {
+                                    const selectElem = document.getElementById('scholarship_type');
+                                    const customContainer = document.getElementById('custom_type_container');
+                                    if (selectElem.value === 'custom') {
+                                        customContainer.classList.remove('hidden');
+                                    } else {
+                                        customContainer.classList.add('hidden');
+                                    }
+                                }
+                            </script>
                         </div>
                     </div>
                     
@@ -233,11 +254,16 @@ if(isset($_POST['update_post'])) {
                         <input type="date" name="deadline" id="deadline" value="<?php echo !empty($post['deadline']) ? htmlspecialchars(date('Y-m-d', strtotime($post['deadline']))) : ''; ?>" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         <p class="mt-1 text-xs text-gray-500">Set the last date students can apply for this scholarship</p>
                     </div>
-                    
-                    <div class="mb-6">
+                      <div class="mb-6">
                         <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Post Content *</label>
                         <textarea name="content" id="content" rows="8" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"><?php echo htmlspecialchars($post['content']); ?></textarea>
                         <p class="mt-1 text-xs text-gray-500">Provide detailed information about the scholarship opportunity.</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="how_to_apply" class="block text-sm font-medium text-gray-700 mb-1">How to Apply</label>
+                        <textarea name="how_to_apply" id="how_to_apply" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"><?php echo isset($post['how_to_apply']) ? htmlspecialchars($post['how_to_apply']) : ''; ?></textarea>
+                        <p class="mt-1 text-xs text-gray-500">Provide instructions for students on how to apply for this scholarship.</p>
                     </div>
                     
                     <div class="mb-6">

@@ -24,7 +24,11 @@ $query = "SELECT p.*, u.username as poster_name
 
 // If filter is not "all", add condition for scholarship type
 if ($scholarship_filter !== 'all') {
-    $query .= " AND (p.scholarship_type = ? OR p.scholarship_type = 'Both')";
+    if ($scholarship_filter === 'Financial Assistantship' || $scholarship_filter === 'Student Assistantship Program') {
+        $query .= " AND (p.scholarship_type = ? OR p.scholarship_type = 'Both')";
+    } else {
+        $query .= " AND p.scholarship_type = ?";
+    }
 }
 
 $query .= " ORDER BY p.created_at DESC";
@@ -107,8 +111,7 @@ $posts = $stmt->get_result();
         </div>
 
         <!-- Scholarship Posts Content -->
-        <div class="p-6">
-            <!-- Filter options -->
+        <div class="p-6">            <!-- Filter options -->
             <div class="mb-6 flex flex-wrap gap-2">
                 <a href="?filter=all" class="px-4 py-2 rounded-full text-sm font-medium <?php echo $scholarship_filter === 'all' ? 'bg-green-500 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'; ?>">
                     All Scholarships
@@ -119,6 +122,24 @@ $posts = $stmt->get_result();
                 <a href="?filter=Student Assistantship Program" class="px-4 py-2 rounded-full text-sm font-medium <?php echo $scholarship_filter === 'Student Assistantship Program' ? 'bg-green-500 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'; ?>">
                     Student Assistantship Program
                 </a>
+                
+                <?php
+                // Get unique scholarship types excluding standard ones
+                $unique_types_query = "SELECT DISTINCT scholarship_type FROM scholarship_posts 
+                                       WHERE scholarship_type NOT IN ('Financial Assistantship', 'Student Assistantship Program', 'Both', '')";
+                $unique_types_result = $conn->query($unique_types_query);
+                
+                if ($unique_types_result && $unique_types_result->num_rows > 0) {
+                    while ($type = $unique_types_result->fetch_assoc()) {
+                        if (!empty($type['scholarship_type'])) {
+                            echo '<a href="?filter=' . urlencode($type['scholarship_type']) . '" 
+                                     class="px-4 py-2 rounded-full text-sm font-medium ' . 
+                                     ($scholarship_filter === $type['scholarship_type'] ? 'bg-green-500 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50') . 
+                                     '">' . htmlspecialchars($type['scholarship_type']) . '</a>';
+                        }
+                    }
+                }
+                ?>
             </div>
             
             <?php if ($posts->num_rows > 0): ?>
@@ -159,8 +180,7 @@ $posts = $stmt->get_result();
                                         </p>
                                     </div>
                                     <div class="flex flex-col gap-2 items-end">
-                                        <?php if (!empty($post['scholarship_type'])): ?>
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        <?php if (!empty($post['scholarship_type'])): ?>                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                 <?php 
                                                 switch ($post['scholarship_type']) {
                                                     case 'Financial Assistantship':
@@ -173,7 +193,12 @@ $posts = $stmt->get_result();
                                                         echo 'bg-green-100 text-green-800';
                                                         break;
                                                     default:
-                                                        echo 'bg-gray-100 text-gray-800';
+                                                        // Generate a consistent color for custom scholarship types
+                                                        $hash = crc32($post['scholarship_type']);
+                                                        $background_colors = ['bg-indigo-100', 'bg-pink-100', 'bg-amber-100', 'bg-cyan-100', 'bg-lime-100', 'bg-rose-100'];
+                                                        $text_colors = ['text-indigo-800', 'text-pink-800', 'text-amber-800', 'text-cyan-800', 'text-lime-800', 'text-rose-800'];
+                                                        $color_index = abs($hash) % count($background_colors);
+                                                        echo $background_colors[$color_index] . ' ' . $text_colors[$color_index];
                                                 }
                                                 ?>">
                                                 <?php echo htmlspecialchars($post['scholarship_type']); ?>

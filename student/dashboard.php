@@ -170,7 +170,7 @@ $user = $stmt->get_result()->fetch_assoc();
                     
                     <?php
                     // Fetch recent scholarship posts
-                    $stmt = $con->prepare("SELECT id, title, scholarship_type, deadline FROM scholarship_posts ORDER BY created_at DESC LIMIT 3");
+                    $stmt = $conn->prepare("SELECT id, title, scholarship_type, deadline FROM scholarship_posts ORDER BY created_at DESC LIMIT 3");
                     $stmt->execute();
                     $result = $stmt->get_result();
 

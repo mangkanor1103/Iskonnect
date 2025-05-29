@@ -67,6 +67,8 @@ $conn->close();
 <!-- Add required libraries for animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<!-- Add SweetAlert2 for beautiful alerts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="flex h-screen bg-white overflow-hidden">
     <!-- Improved Sidebar with subtle gradient -->
@@ -286,6 +288,53 @@ document.addEventListener('DOMContentLoaded', function() {
     openModal.addEventListener('click', () => modal.classList.remove('hidden'));
     closeModal.addEventListener('click', () => modal.classList.add('hidden'));
     cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    
+    // Handle form submission with SweetAlert
+    const addChedForm = document.getElementById('addChedForm');
+    if (addChedForm) {
+        addChedForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('ched_account.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                modal.classList.add('hidden');
+                
+                if (data.includes("successfully")) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'CHED account has been created successfully.',
+                        icon: 'success',
+                        confirmButtonColor: '#3b82f6'
+                    }).then(() => {
+                        // Reload the page to update the CHED accounts list
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data || 'Something went wrong. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#3b82f6'
+                });
+            });
+        });
+    }
 });
 </script>
 

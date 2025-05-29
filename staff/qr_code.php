@@ -47,16 +47,28 @@ $network_check_js = "
 <?php include '../components/header.php'; ?>
 
 <div class="min-h-screen bg-gray-50 flex flex-col">
-    <!-- Simple header -->
+    <!-- Simple header - Modified to include dashboard link -->
     <header class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
-                <h1 class="text-lg font-semibold text-gray-900">Application Form QR Code</h1>
+                <div class="flex items-center space-x-3">
+
+                    <h1 class="text-lg font-semibold text-gray-900">Application Form QR Code</h1>
+                </div>
                 <div class="flex items-center space-x-4">
-                    <a href="dashboard.php"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                        Back to Dashboard
-                    </a>
+                    <div class="hidden md:flex space-x-4 mr-4">
+                        <button id="dashboardBtn" class="hover:text-green-600 transition cursor-pointer"
+                            onclick="window.location.href='dashboard.php'">
+                            <svg class="h-5 w-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                </path>
+                            </svg>
+
+                        </button>
+                        <!-- We'll use the existing modal buttons that are in the header.php -->
+                    </div>
                     <button onclick="window.print()"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -162,18 +174,20 @@ $network_check_js = "
         .qr-container {
             margin-top: 2rem !important;
         }
-        
+
         /* Hide the footer with copyright text when printing */
-        footer, .footer {
+        footer,
+        .footer {
             display: none !important;
         }
-        
+
         /* Hide network status elements when printing */
-        #network-status, #network-message {
+        #network-status,
+        #network-message {
             display: none !important;
             visibility: hidden !important;
         }
-        
+
         /* Ensure QR code is visible */
         .qr-image {
             display: block !important;
@@ -198,11 +212,11 @@ $network_check_js = "
         qrImg.onerror = function () {
             console.error('QR code failed to load');
         };
-        
+
         // PDF download functionality
         const downloadPdfBtn = document.getElementById('download-pdf');
         if (downloadPdfBtn) {
-            downloadPdfBtn.addEventListener('click', function() {
+            downloadPdfBtn.addEventListener('click', function () {
                 // Show loading indicator
                 const originalText = this.innerHTML;
                 this.innerHTML = `
@@ -212,26 +226,26 @@ $network_check_js = "
                     </svg>
                     Generating PDF...
                 `;
-                
+
                 // Wait for libraries to load
                 if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
                     alert('PDF generation libraries are still loading. Please try again in a moment.');
                     this.innerHTML = originalText;
                     return;
                 }
-                
+
                 // Get the section to convert to PDF
                 const printSection = document.querySelector('.print-section');
-                
+
                 // Temporarily hide network status elements
                 const networkStatus = document.getElementById('network-status');
                 const networkMessage = document.getElementById('network-message');
                 const originalNetworkStatusDisplay = networkStatus.style.display;
                 const originalNetworkMessageDisplay = networkMessage.style.display;
-                
+
                 networkStatus.style.display = 'none';
                 networkMessage.style.display = 'none';
-                
+
                 // Use html2canvas to capture the content
                 html2canvas(printSection, {
                     scale: 2, // Higher scale for better quality
@@ -241,29 +255,29 @@ $network_check_js = "
                     // Restore network status elements
                     networkStatus.style.display = originalNetworkStatusDisplay;
                     networkMessage.style.display = originalNetworkMessageDisplay;
-                    
+
                     const { jsPDF } = window.jspdf;
-                    
+
                     // Create PDF instance (A4 size)
                     const pdf = new jsPDF('portrait', 'mm', 'a4');
-                    
+
                     // Get canvas dimensions
                     const imgWidth = 210; // A4 width in mm (210mm)
                     const pageHeight = 297; // A4 height in mm
                     const imgHeight = canvas.height * imgWidth / canvas.width;
-                    
+
                     // Add the canvas as image with proper centering
                     const imgData = canvas.toDataURL('image/png');
-                    
+
                     // Calculate vertical position to center on page
                     const yPosition = Math.max(0, (pageHeight - imgHeight) / 2);
-                    
+
                     // Add the image centered with a slight adjustment to avoid cutting off content at bottom
                     pdf.addImage(imgData, 'PNG', 0, yPosition * 0.7, imgWidth, imgHeight * 0.9);
-                    
+
                     // Save the PDF
                     pdf.save('application_form_qr_code.pdf');
-                    
+
                     // Restore button text
                     this.innerHTML = originalText;
                 }).catch(err => {

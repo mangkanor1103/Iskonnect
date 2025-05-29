@@ -145,8 +145,7 @@ $post = $result->fetch_assoc();
                                 <?php echo date('F j, Y', strtotime($post['created_at'])); ?>
                             </p>
                         </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <?php if (!empty($post['scholarship_type'])): ?>
+                        <div class="flex flex-col items-end gap-2">                            <?php if (!empty($post['scholarship_type'])): ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
                                     <?php
                                     switch ($post['scholarship_type']) {
@@ -160,7 +159,12 @@ $post = $result->fetch_assoc();
                                             echo 'bg-green-100 text-green-800';
                                             break;
                                         default:
-                                            echo 'bg-gray-100 text-gray-800';
+                                            // Generate a consistent color for custom scholarship types
+                                            $hash = crc32($post['scholarship_type']);
+                                            $background_colors = ['bg-indigo-100', 'bg-pink-100', 'bg-amber-100', 'bg-cyan-100', 'bg-lime-100', 'bg-rose-100'];
+                                            $text_colors = ['text-indigo-800', 'text-pink-800', 'text-amber-800', 'text-cyan-800', 'text-lime-800', 'text-rose-800'];
+                                            $color_index = abs($hash) % count($background_colors);
+                                            echo $background_colors[$color_index] . ' ' . $text_colors[$color_index];
                                     }
                                     ?>">
                                     <?php echo htmlspecialchars($post['scholarship_type']); ?>
@@ -243,24 +247,26 @@ $post = $result->fetch_assoc();
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
-
-            <!-- Application Information -->
+            </div>            <!-- Application Information -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
                 <div class="p-6">
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">How to Apply</h3>
                     <div class="prose max-w-none text-gray-700">
-                        <p>To apply for this scholarship opportunity, please follow these steps:</p>
-                        <ol class="list-decimal pl-5 mt-2">
-                            <li class="mb-2">Ensure you meet all the eligibility requirements mentioned above.</li>
-                            <li class="mb-2">Complete the application form available at the Scholarship Office <br>or you may access it via qr code.</li>
-                            <li class="mb-2">Prepare all required documents as specified in the scholarship details.
-                            </li>
-                            <li class="mb-2">Submit your complete application before the deadline.</li>
-                            <li>Follow up with the Scholarship Office for any updates on your application.</li>
-                        </ol>
-                        <p class="mt-4">For more information, please visit the <strong>Office of Student
-                                Affairs</strong> or contact them at <strong>osas@mindorosu.edu.ph</strong>.</p>
+                        <?php if (!empty($post['how_to_apply'])): ?>
+                            <?php echo nl2br(htmlspecialchars($post['how_to_apply'])); ?>
+                        <?php else: ?>
+                            <p>To apply for this scholarship opportunity, please follow these steps:</p>
+                            <ol class="list-decimal pl-5 mt-2">
+                                <li class="mb-2">Ensure you meet all the eligibility requirements mentioned above.</li>
+                                <li class="mb-2">Complete the application form available at the Scholarship Office <br>or you may access it via qr code.</li>
+                                <li class="mb-2">Prepare all required documents as specified in the scholarship details.
+                                </li>
+                                <li class="mb-2">Submit your complete application before the deadline.</li>
+                                <li>Follow up with the Scholarship Office for any updates on your application.</li>
+                            </ol>
+                            <p class="mt-4">For more information, please visit the <strong>Office of Student
+                                    Affairs</strong> or contact them at <strong>osas@mindorosu.edu.ph</strong>.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

@@ -1,65 +1,52 @@
 <?php
-// Check if request is POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
-    exit;
-}
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Get form data
-$name = isset($_POST['name']) ? htmlspecialchars($_POST['name']) : '';
-$email = isset($_POST['email']) ? filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) : '';
-$message = isset($_POST['message']) ? htmlspecialchars($_POST['message']) : '';
+// Include database connection
+include 'components/conn.php';
 
-// Validate data
-if (empty($name) || empty($email) || empty($message) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Please provide valid name, email and message']);
-    exit;
-}
+// Set header to return JSON
+header('Content-Type: application/json');
 
-// Database connection
-$host = 'localhost';
-$dbname = 'iskonnect';  // Make sure this database exists
-$username = 'root';     // Default XAMPP username
-$password = '';         // Default XAMPP password (empty)
-
-try {
-    // Create database connection
-    $conn = new PDO("mysql:host=$host", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Check if the request method is POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get form data
+    $name = isset($_POST['name']) ? trim($_POST['name']) : '';
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $message = isset($_POST['message']) ? trim($_POST['message']) : '';
     
-    // Check if database exists, if not create it
-    $conn->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
-    $conn->exec("USE `$dbname`");
-    
-    // Check if table exists, if not create it
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS `feedback` (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `full_name` varchar(100) NOT NULL,
-            `email` varchar(100) NOT NULL,
-            `message` text NOT NULL,
-            `created_at` datetime NOT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    ");
-    
-    // Insert data
-    $stmt = $conn->prepare("INSERT INTO feedback (full_name, email, message, created_at) VALUES (?, ?, ?, NOW())");
-    $result = $stmt->execute([$name, $email, $message]);
-    
-    if ($result) {
-        echo json_encode(['success' => true, 'message' => 'Thank you for your feedback! We will get back to you soon.']);
-    } else {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Failed to save your message. Please try again.']);
+    // Validate inputs
+    if (empty($name) || empty($email) || empty($message)) {
+        echo json_encode(['success' => false, 'message' => 'All fields are required']);
+        exit;
     }
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'A database error occurred. Please try again later.']);
     
-    // Log error (not displayed to user)
-    error_log('Database Error: ' . $e->getMessage());
+    // Validate email format
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'Please enter a valid email address']);
+        exit;
+    }
+    
+    try {
+        // Prepare SQL statement to insert feedback
+        $stmt = $conn->prepare("INSERT INTO feedback (full_name, email, message, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->bind_param("sss", $name, $email, $message);
+        
+        // Execute the statement
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Feedback submitted successfully']);
+        } else {
+            throw new Exception("Database error: " . $stmt->error);
+        }
+    } catch (Exception $e) {
+        // Log the error (in a real application)
+        error_log($e->getMessage());
+        
+        echo json_encode(['success' => false, 'message' => 'There was an error saving your feedback. Please try again.']);
+    }
+} else {
+    // If not POST request
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
 ?>
