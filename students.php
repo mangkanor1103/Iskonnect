@@ -1,25 +1,38 @@
 <?php
-include 'components/header.php';
+include 'components/header.php'; 
 include 'components/conn.php';
 
+// Add this debugging code to check if table exists
+$check_table = "SHOW TABLES LIKE 'students'";
+$table_result = mysqli_query($conn, $check_table);
+if(mysqli_num_rows($table_result) == 0) {
+    echo "<script>alert('Error: students table does not exist!');</script>";
+}
+
+// Check table structure
+$describe_table = "DESCRIBE students";
+$structure_result = mysqli_query($conn, $describe_table);
+if(!$structure_result) {
+    echo "<script>alert('Error checking table structure: " . mysqli_error($conn) . "');</script>";
+}
+
 // Detect if running locally or online
-$is_localhost = in_array($_SERVER['SERVER_ADDR'], ['127.0.0.1', '::1', '192.168.101.78']) ||
-    strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+$is_localhost = in_array($_SERVER['SERVER_ADDR'], ['127.0.0.1', '::1', '192.168.101.78']) || 
+                strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
 
 // Always allow access regardless of network when online
 $server_ip = "192.168.101.78"; // Keep for backward compatibility
 $client_ip = $_SERVER['REMOTE_ADDR'];
 
-function isOnSameNetwork($client_ip, $server_ip)
-{
+function isOnSameNetwork($client_ip, $server_ip) {
     // Extract IP parts and convert to subnet
     $client_parts = explode('.', $client_ip);
     $server_parts = explode('.', $server_ip);
-
+    
     // Check if both are on same Class C subnet (first 3 octets match)
-    return ($client_parts[0] == $server_parts[0] &&
-        $client_parts[1] == $server_parts[1] &&
-        $client_parts[2] == $server_parts[2]);
+    return ($client_parts[0] == $server_parts[0] && 
+            $client_parts[1] == $server_parts[1] && 
+            $client_parts[2] == $server_parts[2]);
 }
 
 // Only check network restrictions if we're running locally
@@ -30,11 +43,11 @@ $show_warning = false;
 if ($is_localhost) {
     // Local environment - check network
     $same_network = isOnSameNetwork($client_ip, $server_ip);
-
+    
     // If IP is localhost/127.0.0.1, it's a direct server access (development mode)
     // OR if they're on the same network subnet
     $allowed_access = ($client_ip == "127.0.0.1" || $client_ip == "::1" || $same_network);
-
+    
     // If access is not allowed, show warning
     if (!$allowed_access) {
         $show_warning = true;
@@ -47,25 +60,26 @@ if ($is_localhost) {
 
 // Rest of your existing code
 // Check if form is submitted and process the form data
-if (isset($_POST['submit_application'])) {
+if(isset($_POST['submit_application'])) {
+    // Debug: Check if we're actually reaching this code
+    error_log("Application submission started");
+    
     // Process photo upload
     $photo_name = "";
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
+    if(isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
         $upload_dir = "uploads/";
-        // Create directory if it doesn't exist
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
-
+        
         $photo_name = uniqid() . '_' . basename($_FILES['photo']['name']);
         $target_path = $upload_dir . $photo_name;
-
-        // Move uploaded file
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], $target_path)) {
+        
+        if(move_uploaded_file($_FILES['photo']['tmp_name'], $target_path)) {
             $photo_name = $target_path;
         }
     }
-
+    
     // Get form data - Page 1
     // Personal data
     $scholarship_type = isset($_POST['scholarship_type']) ? $_POST['scholarship_type'] : '';
@@ -88,10 +102,10 @@ if (isset($_POST['submit_application'])) {
     $email = isset($_POST['email']) ? $_POST['email'] : '';
     $is_pwd = isset($_POST['pwd']) ? $_POST['pwd'] : '';
     $disability_type = isset($_POST['disability_type']) ? $_POST['disability_type'] : '';
-
+    
     // Family background
     $parent_status = isset($_POST['parent_status']) ? $_POST['parent_status'] : '';
-
+    
     // Father details
     $father_name = isset($_POST['father_name']) ? $_POST['father_name'] : '';
     $father_age = isset($_POST['father_age']) ? $_POST['father_age'] : '';
@@ -106,7 +120,7 @@ if (isset($_POST['submit_application'])) {
     $father_education = isset($_POST['father_education']) ? $_POST['father_education'] : '';
     $father_school = isset($_POST['father_school']) ? $_POST['father_school'] : '';
     $father_unemployment_reason = isset($_POST['father_unemployment']) ? $_POST['father_unemployment'] : '';
-
+    
     // Mother details
     $mother_name = isset($_POST['mother_name']) ? $_POST['mother_name'] : '';
     $mother_age = isset($_POST['mother_age']) ? $_POST['mother_age'] : '';
@@ -121,12 +135,12 @@ if (isset($_POST['submit_application'])) {
     $mother_education = isset($_POST['mother_education']) ? $_POST['mother_education'] : '';
     $mother_school = isset($_POST['mother_school']) ? $_POST['mother_school'] : '';
     $mother_unemployment_reason = isset($_POST['mother_unemployment']) ? $_POST['mother_unemployment'] : '';
-
+    
     // Siblings
     $working_siblings = isset($_POST['working_siblings']) ? $_POST['working_siblings'] : '';
     $studying_siblings = isset($_POST['studying_siblings']) ? $_POST['studying_siblings'] : '';
     $total_siblings = isset($_POST['total_siblings']) ? $_POST['total_siblings'] : '';
-
+    
     // Get form data - Page 2
     // Family expenses (monthly)
     $house_rental = isset($_POST['house_rental']) ? $_POST['house_rental'] : 0;
@@ -153,7 +167,7 @@ if (isset($_POST['submit_application'])) {
     $other_monthly_expenses = isset($_POST['other_monthly_expenses']) ? $_POST['other_monthly_expenses'] : 0;
     $total_monthly_expenses = isset($_POST['total_monthly_expenses']) ? $_POST['total_monthly_expenses'] : 0;
     $annual_monthly_expenses = isset($_POST['annual_monthly_expenses']) ? $_POST['annual_monthly_expenses'] : 0;
-
+    
     // Family expenses (annually)
     $tuition = isset($_POST['tuition']) ? $_POST['tuition'] : 0;
     $withholding_tax = isset($_POST['withholding_tax']) ? $_POST['withholding_tax'] : 0;
@@ -161,7 +175,7 @@ if (isset($_POST['submit_application'])) {
     $other_annual_expenses = isset($_POST['other_annual_expenses']) ? $_POST['other_annual_expenses'] : 0;
     $annual_expenses_subtotal = isset($_POST['annual_expenses_subtotal']) ? $_POST['annual_expenses_subtotal'] : 0;
     $total_annual_expenses = isset($_POST['total_annual_expenses']) ? $_POST['total_annual_expenses'] : 0;
-
+    
     // Family income
     $parents_annual_pay = isset($_POST['parents_annual_pay']) ? $_POST['parents_annual_pay'] : 0;
     $siblings_annual_pay = isset($_POST['siblings_annual_pay']) ? $_POST['siblings_annual_pay'] : 0;
@@ -174,14 +188,14 @@ if (isset($_POST['submit_application'])) {
     $bank_deposits = isset($_POST['bank_deposits']) ? $_POST['bank_deposits'] : 0;
     $other_income = isset($_POST['other_income']) ? $_POST['other_income'] : 0;
     $total_annual_income = isset($_POST['total_annual_income']) ? $_POST['total_annual_income'] : 0;
-
+    
     // Secondary education data
     $secondary_school = isset($_POST['secondary_school']) ? $_POST['secondary_school'] : '';
     $school_location = isset($_POST['school_location']) ? $_POST['school_location'] : '';
     $year_graduated = isset($_POST['year_graduated']) ? $_POST['year_graduated'] : '';
     $general_average = isset($_POST['general_average']) ? $_POST['general_average'] : '';
     $honors_awards = isset($_POST['honors_awards']) ? $_POST['honors_awards'] : '';
-
+    
     // Reference data
     $reference1_name = isset($_POST['reference1_name']) ? $_POST['reference1_name'] : '';
     $reference1_relationship = isset($_POST['reference1_relationship']) ? $_POST['reference1_relationship'] : '';
@@ -189,7 +203,7 @@ if (isset($_POST['submit_application'])) {
     $reference2_name = isset($_POST['reference2_name']) ? $_POST['reference2_name'] : '';
     $reference2_relationship = isset($_POST['reference2_relationship']) ? $_POST['reference2_relationship'] : '';
     $reference2_contact = isset($_POST['reference2_contact']) ? $_POST['reference2_contact'] : '';
-
+    
     // Requirements checkboxes
     $req_photo = isset($_POST['req_photo']) ? 1 : 0;
     $req_itr = isset($_POST['req_itr']) ? 1 : 0;
@@ -198,14 +212,14 @@ if (isset($_POST['submit_application'])) {
     $req_moral = isset($_POST['req_moral']) ? 1 : 0;
     $req_letter = isset($_POST['req_letter']) ? 1 : 0;
     $req_schedule = isset($_POST['req_schedule']) ? 1 : 0;
-
+    
     // Office use data
     $office_received = isset($_POST['office_received']) ? $_POST['office_received'] : '';
     $office_screened = isset($_POST['office_screened']) ? $_POST['office_screened'] : '';
     $office_remarks = isset($_POST['office_remarks']) ? $_POST['office_remarks'] : '';
-
+    
     // Create SQL query to insert all data
-
+    
     // Create associative array with all form data
     $formData = [
         'scholarship_type' => $scholarship_type,
@@ -323,73 +337,80 @@ if (isset($_POST['submit_application'])) {
         'office_remarks' => $office_remarks,
         'status' => 'Pending'
     ];
-
+    
+    // Debug: Log the form data
+    error_log("Form data collected: " . print_r($formData, true));
+    
     // Build column names and placeholders
     $columns = implode(", ", array_keys($formData));
     $placeholders = implode(", ", array_fill(0, count($formData), "?"));
-
+    
     // Create SQL statement
     $sql = "INSERT INTO students ($columns) VALUES ($placeholders)";
-
+    
+    // Debug: Log the SQL
+    error_log("SQL Query: " . $sql);
+    
+    // Prepare statement
     $stmt = $conn->prepare($sql);
-
-    // Get types for bind_param
-    $types = "";
-    $values = [];
-    foreach ($formData as $key => $value) {
-        if (is_int($value)) {
-            $types .= "i"; // integer
-        } elseif (is_float($value) || in_array($key, ['father_income', 'mother_income', 'house_rental', 'food_grocery', 'car_loan', 'other_loan', 'school_bus', 'transportation', 'education_plan', 'insurance_policy', 'health_insurance', 'govt_loans', 'clothing', 'utilities', 'communication', 'helper_expense', 'driver_expense', 'medicines', 'doctors_fee', 'hospitalization', 'recreation', 'other_monthly_expenses', 'total_monthly_expenses', 'annual_monthly_expenses', 'tuition', 'withholding_tax', 'govt_contributions', 'other_annual_expenses', 'annual_expenses_subtotal', 'total_annual_expenses', 'parents_annual_pay', 'siblings_annual_pay', 'business_income', 'land_rental_income', 'property_rental_income', 'pension_income', 'commission_income', 'relative_support', 'bank_deposits', 'other_income', 'total_annual_income'])) {
-            $types .= "d"; // double/decimal
-        } else {
-            $types .= "s"; // string
-        }
-        $values[] = $value;
+    
+    if (!$stmt) {
+        error_log("Prepare failed: " . $conn->error);
+        echo "<script>alert('Database prepare error: " . $conn->error . "');</script>";
+        exit();
     }
-
-    // Prepare the bind_param arguments
-    $bind_params = [$types];
-    foreach ($values as &$value) {
-        $bind_params[] = &$value;
-    }
-
-    // Call bind_param with dynamic arguments
-    call_user_func_array([$stmt, 'bind_param'], $bind_params);
-
-    if ($stmt->execute()) {
-        // For AJAX requests, return JSON response
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Application submitted successfully!']);
-            exit();
-        } else {
-            // Store success message in session
-            $_SESSION['submission_success'] = true;
-
-            // Redirect to index.php with SweetAlert2
-            echo "<script>
+    
+    // Get values array
+    $values = array_values($formData);
+    
+    // Create types string - simplified approach
+    $types = str_repeat('s', count($values)); // Use 's' for all values
+    
+    // Debug: Log values and types
+    error_log("Values: " . print_r($values, true));
+    error_log("Types: " . $types);
+    
+    // Bind parameters
+    $stmt->bind_param($types, ...$values);
+    
+    // Execute
+    if($stmt->execute()) {
+        error_log("Application submitted successfully. Insert ID: " . $conn->insert_id);
+        
+        echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     title: 'Success!',
-                    text: 'Application submitted successfully!',
+                    text: 'Application submitted successfully! ID: " . $conn->insert_id . "',
                     icon: 'success',
-                    timer: 1000,
-                    showConfirmButton: false
+                    timer: 2000,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
                 }).then(() => {
-                    window.location.href = 'index.php';
+                    window.location.href = 'stufeed.php';
                 });
-            </script>";
-            exit();
-        }
+            });
+        </script>";
+        exit();
     } else {
-        // For AJAX requests, return JSON error response
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Error: ' . $stmt->error]);
-            exit();
-        } else {
-            echo "<script>alert('Error: " . $stmt->error . "');</script>";
-        }
+        error_log("Execute failed: " . $stmt->error);
+        echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Error submitting application: " . addslashes($stmt->error) . "',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again',
+                    confirmButtonColor: '#dc2626'
+                });
+            });
+        </script>";
     }
+    
+    $stmt->close();
 }
 ?>
 
@@ -406,57 +427,41 @@ if (isset($_POST['submit_application'])) {
 
         <!-- Data Privacy Notice -->
         <div class="p-4 bg-gray-100 border-b">
-            <p class="text-sm italic text-gray-700"><strong>DATA PRIVACY CLAUSE:</strong> By completing this form, I
-                hereby agree that Mindoro State University, may collect, use, disclose, and process my personal data for
-                the purposes of application for education, scholarships or enrollment. Requests for inspection,
-                amendment, or restriction of records must be in writing and addressed to the Office of Student Affairs
-                and Services and must specify the reasons for the request. Mindoro State University reserves the right
-                to respond appropriately according to law.</p>
-        </div>
+            <p class="text-sm italic text-gray-700"><strong>DATA PRIVACY CLAUSE:</strong> By completing this form, I hereby agree that Mindoro State University, may collect, use, disclose, and process my personal data for the purposes of application for education, scholarships or enrollment. Requests for inspection, amendment, or restriction of records must be in writing and addressed to the Office of Student Affairs and Services and must specify the reasons for the request. Mindoro State University reserves the right to respond appropriately according to law.</p>        </div>
 
         <?php if ($show_warning): ?>
-            <div class="m-6 p-4 bg-red-100 border-l-4 border-red-500 rounded">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-lg font-medium text-red-800">Network Access Restriction</p>
-                        <p class="text-red-700 mt-1">You must be connected to the same network as the server
-                            (<?php echo $server_ip; ?>) to access this form.</p>
-                        <p class="text-red-600 mt-2">Your IP address: <?php echo $client_ip; ?></p>
-                        <p class="text-red-700 mt-2">Please connect to the designated network and try again.</p>
-                    </div>
+        <div class="m-6 p-4 bg-red-100 border-l-4 border-red-500 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-lg font-medium text-red-800">Network Access Restriction</p>
+                    <p class="text-red-700 mt-1">You must be connected to the same network as the server (<?php echo $server_ip; ?>) to access this form.</p>
+                    <p class="text-red-600 mt-2">Your IP address: <?php echo $client_ip; ?></p>
+                    <p class="text-red-700 mt-2">Please connect to the designated network and try again.</p>
                 </div>
             </div>
+        </div>
         <?php endif; ?>
 
         <form class="p-6" method="post" enctype="multipart/form-data" <?php echo $show_warning ? 'onsubmit="return false;"' : ''; ?>>
             <!-- Tab Navigation -->
-
+            
             <?php if ($show_warning): ?>
-                <input type="hidden" id="network-warning-exists" value="1">
+            <input type="hidden" id="network-warning-exists" value="1">
             <?php endif; ?>
             <div class="mb-6">
                 <div class="flex border-b border-gray-200">
-                    <button type="button"
-                        class="py-2 px-4 text-center border-b-2 border-green-500 font-medium text-sm text-green-600 bg-white tab-btn active"
-                        onclick="showTab('personal-tab')">
+                    <button type="button" class="py-2 px-4 text-center border-b-2 border-green-500 font-medium text-sm text-green-600 bg-white tab-btn active" onclick="showTab('personal-tab')">
                         Personal & Family
                     </button>
-                    <button type="button"
-                        class="py-2 px-4 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 tab-btn"
-                        onclick="showTab('financial-tab')">
+                    <button type="button" class="py-2 px-4 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 tab-btn" onclick="showTab('financial-tab')">
                         Financial Assistantship
                     </button>
-                    <button type="button"
-                        class="py-2 px-4 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 tab-btn"
-                        onclick="showTab('education-tab')">
+                    <button type="button" class="py-2 px-4 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 tab-btn" onclick="showTab('education-tab')">
                         Student Assistantship Program
                     </button>
                 </div>
@@ -467,53 +472,42 @@ if (isset($_POST['submit_application'])) {
                 <!-- Scholarship Type Selection -->
                 <div class="mb-6 flex flex-wrap gap-4">
                     <div class="flex items-center">
-                        <input type="radio" id="financial" name="scholarship_type"
-                            value="Financial Assistantship Program"
-                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                        <label for="financial" class="ml-2 block text-sm font-medium text-gray-700">Financial
-                            Assistantship</label>
+                        <input type="radio" id="financial" name="scholarship_type" value="Financial Assistantship Program" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                        <label for="financial" class="ml-2 block text-sm font-medium text-gray-700">Financial Assistantship</label>
                     </div>
                     <div class="flex items-center">
-                        <input type="radio" id="student_assist" name="scholarship_type"
-                            value="Student Assistantship Program"
-                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                        <label for="student_assist" class="ml-2 block text-sm font-medium text-gray-700">Student
-                            Assistantship Program</label>
+                        <input type="radio" id="student_assist" name="scholarship_type" value="Student Assistantship Program" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                        <label for="student_assist" class="ml-2 block text-sm font-medium text-gray-700">Student Assistantship Program</label>
                     </div>
                 </div>
 
                 <div class="border-b-2 border-gray-300 mb-6"></div>
-
+                
                 <!-- General Instructions -->
                 <div class="mb-6">
-                    <p class="font-medium text-gray-800">General Instructions: Please print in black or blue ink or type
-                        all information requested</p>
+                    <p class="font-medium text-gray-800">General Instructions: Please print in black or blue ink or type all information requested</p>
                 </div>
 
                 <!-- PERSONAL DATA -->
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-green-800 mb-4 bg-green-100 p-2">PERSONAL DATA</h2>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="col-span-3">
                             <!-- Name Section -->
                             <div class="mb-4">
-                                <label class="block text-gray-700 mb-2">Name: (Please use legal name based on Birth or
-                                    Marriage Certificate)</label>
+                                <label class="block text-gray-700 mb-2">Name: (Please use legal name based on Birth or Marriage Certificate)</label>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
-                                        <input type="text" name="last_name"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <input type="text" name="last_name" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                         <span class="text-xs text-gray-500">LAST</span>
                                     </div>
                                     <div>
-                                        <input type="text" name="first_name"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <input type="text" name="first_name" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                         <span class="text-xs text-gray-500">FIRST</span>
                                     </div>
                                     <div>
-                                        <input type="text" name="middle_name"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <input type="text" name="middle_name" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                         <span class="text-xs text-gray-500">MIDDLE</span>
                                     </div>
                                 </div>
@@ -523,33 +517,27 @@ if (isset($_POST['submit_application'])) {
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label for="course_yr" class="block text-gray-700 mb-1">Course Yr:</label>
-                                    <input type="text" id="course_yr" name="course_yr"
-                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                    <input type="text" id="course_yr" name="course_yr" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                 </div>
                                 <div>
                                     <label for="civil_status" class="block text-gray-700 mb-1">Civil Status:</label>
-                                    <input type="text" id="civil_status" name="civil_status"
-                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                    <input type="text" id="civil_status" name="civil_status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                 </div>
                             </div>
                         </div>
-
+                        
                         <!-- Photo Upload Section -->
                         <div class="md:col-span-1 flex flex-col items-center">
                             <div class="w-full border border-gray-300 rounded-lg overflow-hidden bg-gray-50 mb-2">
                                 <div class="aspect-w-3 aspect-h-4 w-full">
-                                    <img id="photo-preview" src="https://via.placeholder.com/150?text=2x2+Photo"
-                                        alt="Student Photo" class="w-full h-full object-cover">
+                                    <img id="photo-preview" src="https://via.placeholder.com/150?text=2x2+Photo" alt="Student Photo" class="w-full h-full object-cover">
                                 </div>
                             </div>
-                            <label for="photo-upload"
-                                class="w-full cursor-pointer bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-md transition">
+                            <label for="photo-upload" class="w-full cursor-pointer bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-md transition">
                                 Upload 2x2 Photo
-                                <input type="file" id="photo-upload" name="photo" class="hidden" accept="image/*"
-                                    onchange="previewPhoto(this)">
+                                <input type="file" id="photo-upload" name="photo" class="hidden" accept="image/*" onchange="previewPhoto(this)">
                             </label>
-                            <p class="text-xs text-gray-500 mt-1 text-center">2x2 recent colored photo with white
-                                background</p>
+                            <p class="text-xs text-gray-500 mt-1 text-center">2x2 recent colored photo with white background</p>
                         </div>
                     </div>
 
@@ -559,28 +547,33 @@ if (isset($_POST['submit_application'])) {
                             <label class="block text-gray-700 mb-2">Sex:</label>
                             <div class="flex space-x-4">
                                 <div class="flex items-center">
-                                    <input type="radio" id="male" name="gender" value="male"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                                placeholder="MM/DD/YYYY">
+                                    <input type="radio" id="male" name="gender" value="male" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                    <label for="male" class="ml-2 block text-sm font-medium text-gray-700">Male</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="female" name="gender" value="female" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                    <label for="female" class="ml-2 block text-sm font-medium text-gray-700">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="dob" class="block text-gray-700 mb-1">Date of Birth:</label>
+                            <input type="date" id="dob" name="dob" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" placeholder="MM/DD/YYYY">
                         </div>
                         <div>
                             <label for="pob" class="block text-gray-700 mb-1">Place of Birth:</label>
-                            <input type="text" id="pob" name="pob"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" id="pob" name="pob" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
                             <label for="student_id" class="block text-gray-700 mb-1">Student ID Number:</label>
-                            <input type="text" id="student_id" name="student_id"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" id="student_id" name="student_id" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
 
                     <!-- Address -->
                     <div class="mb-4">
-                        <label for="address" class="block text-gray-700 mb-1">Address:
-                            (No./St/Subd./Brgy/City/Country)</label>
-                        <input type="text" id="address" name="address"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                        <label for="address" class="block text-gray-700 mb-1">Address: (No./St/Subd./Brgy/City/Country)</label>
+                        <input type="text" id="address" name="address" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                     </div>
 
                     <!-- Residence Type -->
@@ -588,24 +581,17 @@ if (isset($_POST['submit_application'])) {
                         <label class="block text-gray-700 mb-2">Residing at:</label>
                         <div class="flex flex-wrap gap-4">
                             <div class="flex items-center">
-                                <input type="radio" id="boarding" name="residence" value="boarding"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="boarding" class="ml-2 block text-sm font-medium text-gray-700">Boarding
-                                    House</label>
+                                <input type="radio" id="boarding" name="residence" value="boarding" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="boarding" class="ml-2 block text-sm font-medium text-gray-700">Boarding House</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="parents" name="residence" value="parents"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="parents" class="ml-2 block text-sm font-medium text-gray-700">Parent's
-                                    House</label>
+                                <input type="radio" id="parents" name="residence" value="parents" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="parents" class="ml-2 block text-sm font-medium text-gray-700">Parent's House</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="guardian" name="residence" value="guardian"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="guardian" class="ml-2 block text-sm font-medium text-gray-700">With
-                                    Guardian:</label>
-                                <input type="text" name="guardian_name"
-                                    class="ml-2 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 w-40">
+                                <input type="radio" id="guardian" name="residence" value="guardian" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="guardian" class="ml-2 block text-sm font-medium text-gray-700">With Guardian:</label>
+                                <input type="text" name="guardian_name" class="ml-2 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 w-40">
                             </div>
                         </div>
                     </div>
@@ -614,19 +600,15 @@ if (isset($_POST['submit_application'])) {
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
                             <label for="telephone" class="block text-gray-700 mb-1">Telephone No.:</label>
-                            <input type="text" id="telephone" name="telephone"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" id="telephone" name="telephone" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
                             <label for="religion" class="block text-gray-700 mb-1">Religion:</label>
-                            <input type="text" id="religion" name="religion"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" id="religion" name="religion" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label for="existing_scholarship" class="block text-gray-700 mb-1">Existing Scholarship/s
-                                (If any):</label>
-                            <input type="text" id="existing_scholarship" name="existing_scholarship"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="existing_scholarship" class="block text-gray-700 mb-1">Existing Scholarship/s (If any):</label>
+                            <input type="text" id="existing_scholarship" name="existing_scholarship" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
 
@@ -634,14 +616,11 @@ if (isset($_POST['submit_application'])) {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="mobile" class="block text-gray-700 mb-1">Mobile No.:</label>
-                            <input type="text" id="mobile" name="mobile"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" id="mobile" name="mobile" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label for="email" class="block text-gray-700 mb-1">E-mail Address: (please write
-                                legibly)</label>
-                            <input type="email" id="email" name="email"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="email" class="block text-gray-700 mb-1">E-mail Address: (please write legibly)</label>
+                            <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
 
@@ -650,21 +629,17 @@ if (isset($_POST['submit_application'])) {
                         <label class="block text-gray-700 mb-2">Person with Disability (PWD):</label>
                         <div class="flex space-x-4">
                             <div class="flex items-center">
-                                <input type="radio" id="pwd_yes" name="pwd" value="yes"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <input type="radio" id="pwd_yes" name="pwd" value="yes" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
                                 <label for="pwd_yes" class="ml-2 block text-sm font-medium text-gray-700">Yes</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="pwd_no" name="pwd" value="no"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <input type="radio" id="pwd_no" name="pwd" value="no" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
                                 <label for="pwd_no" class="ml-2 block text-sm font-medium text-gray-700">No</label>
                             </div>
                         </div>
                         <div class="mt-2">
-                            <label for="disability_type" class="block text-gray-700 mb-1">If Yes, type of
-                                disability:</label>
-                            <input type="text" id="disability_type" name="disability_type"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="disability_type" class="block text-gray-700 mb-1">If Yes, type of disability:</label>
+                            <input type="text" id="disability_type" name="disability_type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
                 </div>
@@ -672,40 +647,30 @@ if (isset($_POST['submit_application'])) {
                 <!-- FAMILY BACKGROUND -->
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-green-800 mb-4 bg-green-100 p-2">FAMILY BACKGROUND</h2>
-
+                    
                     <!-- Parents status -->
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Status of Parents:</label>
                         <div class="flex flex-wrap gap-4">
                             <div class="flex items-center">
-                                <input type="radio" id="living_together" name="parent_status" value="living_together"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="living_together" class="ml-2 block text-sm font-medium text-gray-700">Living
-                                    Together</label>
+                                <input type="radio" id="living_together" name="parent_status" value="living_together" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="living_together" class="ml-2 block text-sm font-medium text-gray-700">Living Together</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="separated" name="parent_status" value="separated"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="separated"
-                                    class="ml-2 block text-sm font-medium text-gray-700">Separated</label>
+                                <input type="radio" id="separated" name="parent_status" value="separated" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="separated" class="ml-2 block text-sm font-medium text-gray-700">Separated</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="single_parent" name="parent_status" value="single_parent"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="single_parent" class="ml-2 block text-sm font-medium text-gray-700">Single
-                                    Parent</label>
+                                <input type="radio" id="single_parent" name="parent_status" value="single_parent" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="single_parent" class="ml-2 block text-sm font-medium text-gray-700">Single Parent</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="father_deceased" name="parent_status" value="father_deceased"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="father_deceased" class="ml-2 block text-sm font-medium text-gray-700">Father
-                                    Deceased</label>
+                                <input type="radio" id="father_deceased" name="parent_status" value="father_deceased" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="father_deceased" class="ml-2 block text-sm font-medium text-gray-700">Father Deceased</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="radio" id="mother_deceased" name="parent_status" value="mother_deceased"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
-                                <label for="mother_deceased" class="ml-2 block text-sm font-medium text-gray-700">Mother
-                                    Deceased</label>
+                                <input type="radio" id="mother_deceased" name="parent_status" value="mother_deceased" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                <label for="mother_deceased" class="ml-2 block text-sm font-medium text-gray-700">Mother Deceased</label>
                             </div>
                         </div>
                     </div>
@@ -723,96 +688,68 @@ if (isset($_POST['submit_application'])) {
                             <tbody>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Name</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_name"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_name"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_name" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_name" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Age</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_age"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_age"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_age" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_age" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Permanent Home Address</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="father_address" class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="mother_address" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_address" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_address" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Tel. No.</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_tel"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_tel"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_tel" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_tel" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Mobile No.</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_mobile"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_mobile"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_mobile" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_mobile" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Email Address</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_email"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_email"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_email" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_email" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Occupation/Position</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="father_occupation" class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="mother_occupation" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_occupation" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_occupation" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Company</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="father_company" class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="mother_company" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_company" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_company" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Average Monthly Income</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_income"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_income"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_income" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_income" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
-                                    <td class="border border-gray-300 px-4 py-2 font-medium">Number of years in service
-                                    </td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_years"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_years"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-4 py-2 font-medium">Number of years in service</td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_years" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_years" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">Educational Attainment</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="father_education" class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="mother_education" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_education" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_education" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-300 px-4 py-2 font-medium">School or College</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_school"
-                                            class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_school"
-                                            class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_school" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_school" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                                 <tr>
-                                    <td class="border border-gray-300 px-4 py-2 font-medium">Reason/s for being
-                                        unemployed</td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="father_unemployment" class="w-full border-0 focus:ring-0"></td>
-                                    <td class="border border-gray-300 px-2 py-2"><input type="text"
-                                            name="mother_unemployment" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-4 py-2 font-medium">Reason/s for being unemployed</td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="father_unemployment" class="w-full border-0 focus:ring-0"></td>
+                                    <td class="border border-gray-300 px-2 py-2"><input type="text" name="mother_unemployment" class="w-full border-0 focus:ring-0"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -820,26 +757,20 @@ if (isset($_POST['submit_application'])) {
 
                     <!-- Siblings Information -->
                     <div class="mb-4">
-                        <h3 class="text-md font-bold text-gray-800 mb-2">BROTHERS AND SISTERS (Please attach additional
-                            sheet if necessary)</h3>
-
+                        <h3 class="text-md font-bold text-gray-800 mb-2">BROTHERS AND SISTERS (Please attach additional sheet if necessary)</h3>
+                        
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Number of Working
-                                    Sibling/s</label>
-                                <input type="number" name="working_siblings"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                <label class="block text-sm font-medium text-gray-700">Number of Working Sibling/s</label>
+                                <input type="number" name="working_siblings" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Number of Studying
-                                    Sibling/s</label>
-                                <input type="number" name="studying_siblings"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                <label class="block text-sm font-medium text-gray-700">Number of Studying Sibling/s</label>
+                                <input type="number" name="studying_siblings" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Total Number of Sibling/s</label>
-                                <input type="number" name="total_siblings"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                <input type="number" name="total_siblings" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                             </div>
                         </div>
                     </div>
@@ -847,14 +778,10 @@ if (isset($_POST['submit_application'])) {
 
                 <!-- Next Button -->
                 <div class="flex justify-center">
-                    <button type="button"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg"
-                        onclick="showTab('financial-tab')">
+                    <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg" onclick="showTab('financial-tab')">
                         Next Section
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                         </svg>
                     </button>
                 </div>
@@ -865,13 +792,13 @@ if (isset($_POST['submit_application'])) {
                 <!-- FAMILY EXPENSES AND INCOME -->
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-green-800 mb-4 bg-green-100 p-2">FAMILY EXPENSES AND INCOME</h2>
-
+                    
                     <!-- Two-column layout for income and expenses -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Left column: Family Expenses -->
                         <div>
                             <h3 class="font-bold text-gray-800 mb-3">FAMILY EXPENSES (Monthly)</h3>
-
+                            
                             <!-- Monthly expenses table -->
                             <table class="w-full mb-6">
                                 <tbody>
@@ -880,8 +807,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="house_rental"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="house_rental" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -890,8 +816,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="food_grocery"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="food_grocery" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -900,8 +825,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="car_loan"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="car_loan" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -910,8 +834,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="other_loan"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="other_loan" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -920,8 +843,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="school_bus"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="school_bus" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -930,8 +852,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="transportation"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="transportation" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -940,8 +861,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="education_plan"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="education_plan" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -950,8 +870,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="insurance_policy"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="insurance_policy" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -960,8 +879,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="health_insurance"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="health_insurance" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -970,8 +888,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="govt_loans"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="govt_loans" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -980,8 +897,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="clothing"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="clothing" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -990,8 +906,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="utilities"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="utilities" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1000,8 +915,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="communication"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="communication" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1009,13 +923,10 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2 pr-4">Helper/Yaya (how many?)</td>
                                         <td class="py-2">
                                             <div class="grid grid-cols-2 gap-2">
-                                                <input type="number" name="helper_count"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                                                    placeholder="Count">
+                                                <input type="number" name="helper_count" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" placeholder="Count">
                                                 <div class="flex items-center">
                                                     <span class="mr-2">PhP</span>
-                                                    <input type="text" name="helper_expense"
-                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                    <input type="text" name="helper_expense" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                                 </div>
                                             </div>
                                         </td>
@@ -1024,13 +935,10 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2 pr-4">Driver (how many?)</td>
                                         <td class="py-2">
                                             <div class="grid grid-cols-2 gap-2">
-                                                <input type="number" name="driver_count"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                                                    placeholder="Count">
+                                                <input type="number" name="driver_count" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" placeholder="Count">
                                                 <div class="flex items-center">
                                                     <span class="mr-2">PhP</span>
-                                                    <input type="text" name="driver_expense"
-                                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                    <input type="text" name="driver_expense" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                                 </div>
                                             </div>
                                         </td>
@@ -1040,8 +948,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="medicines"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="medicines" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1050,8 +957,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="doctors_fee"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="doctors_fee" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1060,8 +966,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="hospitalization"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="hospitalization" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1070,8 +975,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="recreation"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="recreation" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1080,8 +984,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="other_monthly_expenses"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="other_monthly_expenses" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1090,8 +993,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="total_monthly_expenses"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="total_monthly_expenses" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1100,8 +1002,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="annual_monthly_expenses"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="annual_monthly_expenses" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1109,7 +1010,7 @@ if (isset($_POST['submit_application'])) {
                             </table>
 
                             <h3 class="font-bold text-gray-800 mb-3 mt-6">FAMILY EXPENSES (Annually)</h3>
-
+                            
                             <!-- Annual expenses table -->
                             <table class="w-full mb-6">
                                 <tbody>
@@ -1118,8 +1019,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="tuition"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="tuition" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1128,8 +1028,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="withholding_tax"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="withholding_tax" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1138,8 +1037,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="govt_contributions"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="govt_contributions" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1148,8 +1046,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="other_annual_expenses"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="other_annual_expenses" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1158,8 +1055,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="annual_expenses_subtotal"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="annual_expenses_subtotal" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1168,8 +1064,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="total_annual_expenses"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="total_annual_expenses" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1180,7 +1075,7 @@ if (isset($_POST['submit_application'])) {
                         <!-- Right column: Family Income -->
                         <div>
                             <h3 class="font-bold text-gray-800 mb-3">FAMILY INCOME (Gross)</h3>
-
+                            
                             <!-- Income table -->
                             <table class="w-full mb-6">
                                 <tbody>
@@ -1189,8 +1084,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="parents_annual_pay"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="parents_annual_pay" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1199,8 +1093,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="siblings_annual_pay"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="siblings_annual_pay" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1209,8 +1102,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="business_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="business_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1219,8 +1111,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="land_rental_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="land_rental_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1229,8 +1120,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="property_rental_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="property_rental_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1239,8 +1129,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="pension_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="pension_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1249,8 +1138,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="commission_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="commission_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1259,8 +1147,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="relative_support"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="relative_support" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1269,8 +1156,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="bank_deposits"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="bank_deposits" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1279,8 +1165,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="other_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="other_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1289,8 +1174,7 @@ if (isset($_POST['submit_application'])) {
                                         <td class="py-2">
                                             <div class="flex items-center">
                                                 <span class="mr-2">PhP</span>
-                                                <input type="text" name="total_annual_income"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                                <input type="text" name="total_annual_income" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                             </div>
                                         </td>
                                     </tr>
@@ -1302,33 +1186,28 @@ if (isset($_POST['submit_application'])) {
                                 <p class="mb-2">Do you have other relative/s who help out in your finances?</p>
                                 <div class="flex items-center space-x-4 mb-3">
                                     <label class="inline-flex items-center">
-                                        <input type="radio" name="relative_assistance" value="yes"
-                                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                        <input type="radio" name="relative_assistance" value="yes" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
                                         <span class="ml-2">Yes</span>
                                     </label>
                                     <label class="inline-flex items-center">
-                                        <input type="radio" name="relative_assistance" value="no"
-                                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                        <input type="radio" name="relative_assistance" value="no" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
                                         <span class="ml-2">No</span>
                                     </label>
                                 </div>
                                 <div id="relative_assistance_details" class="space-y-3">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Name/s:</label>
-                                        <input type="text" name="relative_names"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <input type="text" name="relative_names" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Relation:</label>
-                                        <input type="text" name="relative_relation"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <input type="text" name="relative_relation" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Amount:</label>
                                         <div class="flex items-center">
                                             <span class="mr-2">PhP</span>
-                                            <input type="text" name="relative_support_amount"
-                                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                            <input type="text" name="relative_support_amount" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                                         </div>
                                     </div>
                                 </div>
@@ -1339,23 +1218,16 @@ if (isset($_POST['submit_application'])) {
 
                 <!-- Navigation Buttons -->
                 <div class="flex justify-between mt-8">
-                    <button type="button"
-                        class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg"
-                        onclick="showTab('personal-tab')">
-                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                            </path>
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg" onclick="showTab('personal-tab')">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
                         Previous Section
                     </button>
-                    <button type="button"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg open-submit-btn">
-                        Submit Application
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                            </path>
+                    <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg" onclick="showTab('education-tab')">
+                        Next Section
+                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
                     </button>
                 </div>
@@ -1366,81 +1238,63 @@ if (isset($_POST['submit_application'])) {
                 <!-- EDUCATION-SECONDARY -->
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-green-800 mb-4 bg-green-100 p-2">EDUCATION-SECONDARY</h2>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         <div>
-                            <label for="secondary_school"
-                                class="block text-sm font-medium text-gray-700 mb-1">School</label>
-                            <input type="text" id="secondary_school" name="secondary_school"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="secondary_school" class="block text-sm font-medium text-gray-700 mb-1">School</label>
+                            <input type="text" id="secondary_school" name="secondary_school" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label for="school_location"
-                                class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                            <input type="text" id="school_location" name="school_location"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="school_location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <input type="text" id="school_location" name="school_location" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label for="year_graduated" class="block text-sm font-medium text-gray-700 mb-1">Year
-                                Graduated</label>
-                            <input type="text" id="year_graduated" name="year_graduated"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="year_graduated" class="block text-sm font-medium text-gray-700 mb-1">Year Graduated</label>
+                            <input type="text" id="year_graduated" name="year_graduated" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label for="general_average" class="block text-sm font-medium text-gray-700 mb-1">General
-                                Average</label>
-                            <input type="text" id="general_average" name="general_average"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label for="general_average" class="block text-sm font-medium text-gray-700 mb-1">General Average</label>
+                            <input type="text" id="general_average" name="general_average" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
-
+                    
                     <div class="mb-4">
-                        <label for="honors_awards" class="block text-sm font-medium text-gray-700 mb-1">Honors/Awards
-                            Received</label>
-                        <textarea id="honors_awards" name="honors_awards" rows="2"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"></textarea>
+                        <label for="honors_awards" class="block text-sm font-medium text-gray-700 mb-1">Honors/Awards Received</label>
+                        <textarea id="honors_awards" name="honors_awards" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"></textarea>
                     </div>
                 </div>
 
                 <!-- References -->
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-green-800 mb-4 bg-green-100 p-2">REFERENCES</h2>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                            <input type="text" name="reference1_name"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" name="reference1_name" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Relationship to the
-                                Applicant</label>
-                            <input type="text" name="reference1_relationship"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Relationship to the Applicant</label>
+                            <input type="text" name="reference1_relationship" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                            <input type="text" name="reference1_contact"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" name="reference1_contact" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                            <input type="text" name="reference2_name"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" name="reference2_name" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Relationship to the
-                                Applicant</label>
-                            <input type="text" name="reference2_relationship"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Relationship to the Applicant</label>
+                            <input type="text" name="reference2_relationship" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                            <input type="text" name="reference2_contact"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            <input type="text" name="reference2_contact" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                         </div>
                     </div>
                 </div>
@@ -1448,9 +1302,7 @@ if (isset($_POST['submit_application'])) {
                 <!-- Certification -->
                 <div class="mb-8">
                     <div class="p-4 bg-gray-50 border rounded-lg">
-                        <p class="mb-4">I hereby certify that the above information is true and correct. Any
-                            misrepresentation of facts will render this form invalid, and will immediately disqualify my
-                            application to this scholarship.</p>
+                        <p class="mb-4">I hereby certify that the above information is true and correct. Any misrepresentation of facts will render this form invalid, and will immediately disqualify my application to this scholarship.</p>
                         <div class="flex flex-col items-center space-y-2 mt-4">
                             <div class="w-48 border-b border-black mb-2"></div>
                             <p>Signature over Printed name</p>
@@ -1461,12 +1313,11 @@ if (isset($_POST['submit_application'])) {
                 <!-- Other Requirements -->
                 <div class="mb-8">
                     <h2 class="text-lg font-bold text-green-800 mb-4 bg-green-100 p-2">OTHER REQUIREMENTS</h2>
-
+                    
                     <div class="space-y-2">
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_photo"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_photo" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label class="font-medium text-gray-700">One 2x2 ID Picture</label>
@@ -1474,38 +1325,31 @@ if (isset($_POST['submit_application'])) {
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_itr"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_itr" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label class="font-medium text-gray-700">Latest Income Tax Return of Both Parents or
-                                    Affidavit of Non-Filing Income Tax Return</label>
+                                <label class="font-medium text-gray-700">Latest Income Tax Return of Both Parents or Affidavit of Non-Filing Income Tax Return</label>
                             </div>
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_ofw"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_ofw" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label class="font-medium text-gray-700">If OFW, copy of contract or any proof of
-                                    income</label>
+                                <label class="font-medium text-gray-700">If OFW, copy of contract or any proof of income</label>
                             </div>
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_grades"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_grades" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label class="font-medium text-gray-700">First Year Applicant: Certified True Copy of
-                                    latest SHS Report Card</label>
+                                <label class="font-medium text-gray-700">First Year Applicant: Certified True Copy of latest SHS Report Card</label>
                             </div>
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_moral"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_moral" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label class="font-medium text-gray-700">Certificate of Good Moral Character</label>
@@ -1513,8 +1357,7 @@ if (isset($_POST['submit_application'])) {
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_letter"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_letter" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label class="font-medium text-gray-700">Letter of Intent</label>
@@ -1522,12 +1365,10 @@ if (isset($_POST['submit_application'])) {
                         </div>
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input type="checkbox" name="req_schedule"
-                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <input type="checkbox" name="req_schedule" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label class="font-medium text-gray-700">For Student Assistantship: Proposed Schedule of
-                                    Duty</label>
+                                <label class="font-medium text-gray-700">For Student Assistantship: Proposed Schedule of Duty</label>
                             </div>
                         </div>
                     </div>
@@ -1540,40 +1381,32 @@ if (isset($_POST['submit_application'])) {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Received</label>
-                                <input type="text" name="office_received"
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                <input type="text" name="office_received" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Screened</label>
-                                <input type="text" name="office_screened"
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                <input type="text" name="office_screened" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
                             </div>
                         </div>
                         <div class="mt-3">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action/Remarks</label>
-                            <textarea name="office_remarks" rows="2"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"></textarea>
+                            <textarea name="office_remarks" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"></textarea>
                         </div>
                     </div>
-                </div> <!-- Navigation Buttons -->
+                </div>
+
+                <!-- Navigation Buttons -->
                 <div class="flex justify-between mt-8">
-                    <button type="button"
-                        class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg"
-                        onclick="showTab('financial-tab')">
-                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                            </path>
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg" onclick="showTab('financial-tab')">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
                         Previous Section
                     </button>
-                    <button type="button"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg open-submit-btn">
+                    <button type="submit" name="submit_application" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg">
                         Submit Application
-                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                            </path>
+                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                     </button>
                 </div>
@@ -1589,48 +1422,48 @@ if (isset($_POST['submit_application'])) {
         // Hide all tab content
         const tabContents = document.querySelectorAll('.tab-content');
         tabContents.forEach(tab => tab.classList.add('hidden'));
-
+        
         // Remove active class from all tab buttons
         const tabButtons = document.querySelectorAll('.tab-btn');
         tabButtons.forEach(button => {
             button.classList.remove('border-green-500', 'text-green-600');
             button.classList.add('border-transparent', 'text-gray-500');
         });
-
+        
         // Show the selected tab content
         document.getElementById(tabId).classList.remove('hidden');
-
+        
         // Add active class to selected tab button
         const activeButton = document.querySelector(`[onclick="showTab('${tabId}')"]`);
         activeButton.classList.remove('border-transparent', 'text-gray-500');
         activeButton.classList.add('border-green-500', 'text-green-600');
     }
-
+    
     // Preview image when selected
     function previewPhoto(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 document.getElementById('photo-preview').src = e.target.result;
             }
             reader.readAsDataURL(input.files[0]);
         }
     }
-
+    
     // Calculate financial totals
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Set up relative_assistance toggle
         const relativeAssistance = document.querySelectorAll('input[name="relative_assistance"]');
         const relativeAssistanceDetails = document.getElementById('relative_assistance_details');
-
+        
         if (relativeAssistance && relativeAssistanceDetails) {
             relativeAssistance.forEach(radio => {
-                radio.addEventListener('change', function () {
+                radio.addEventListener('change', function() {
                     relativeAssistanceDetails.style.display = this.value === 'yes' ? 'block' : 'none';
                 });
             });
         }
-
+        
         // Initialize state of relative assistance section
         if (relativeAssistanceDetails) {
             const selectedRadio = document.querySelector('input[name="relative_assistance"]:checked');
@@ -1638,317 +1471,7 @@ if (isset($_POST['submit_application'])) {
                 relativeAssistanceDetails.style.display = 'none';
             }
         }
-
-        // Check if application was already submitted
-        const isAlreadySubmitted = localStorage.getItem('application_submitted');
-        if (isAlreadySubmitted) {
-            // Disable all form inputs
-            const form = document.querySelector('form');
-            const formInputs = form.querySelectorAll('input, textarea, select, button[type="button"]');
-            formInputs.forEach(input => {
-                input.disabled = true;
-            });
-            
-            // Show notification and replace submit buttons
-            const submitButtons = document.querySelectorAll('.open-submit-btn');
-            submitButtons.forEach(button => {
-                button.innerHTML = 'Already Submitted';
-                button.disabled = true;
-                button.classList.remove('bg-green-600', 'hover:bg-green-700');
-                button.classList.add('bg-gray-400', 'cursor-not-allowed');
-                button.onclick = function() {
-                    Swal.fire({
-                        title: 'Already Submitted',
-                        text: 'You have already submitted your application.',
-                        icon: 'info',
-                        confirmButtonColor: '#16a34a'
-                    });
-                };
-            });
-            
-            // Show notification
-            Swal.fire({
-                title: 'Application Status',
-                text: 'You have already submitted your application.',
-                icon: 'info',
-                confirmButtonColor: '#16a34a'
-            });
-        }
-    });
-
-    // Modal handling
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get modal elements
-        const feedbackModal = document.getElementById('feedbackModal');
-        const submitModal = document.getElementById('submitModal');
-
-        // Get buttons
-        const openSubmitModalButtons = document.querySelectorAll('.open-submit-btn');
-        const closeFeedbackModalButton = document.getElementById('closeFeedbackModal');
-        const submitFeedbackButton = document.getElementById('submitFeedbackBtn');
-        const closeSubmitModalButton = document.getElementById('closeSubmitModal');
-
-        // Open feedback modal when any submit button is clicked
-        openSubmitModalButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                feedbackModal.classList.remove('hidden');
-            });
-        });
-
-        // Close feedback modal when cancel button is clicked
-        if (closeFeedbackModalButton) {
-            closeFeedbackModalButton.addEventListener('click', function () {
-                feedbackModal.classList.add('hidden');
-            });
-        }
-
-        // Handle feedback submission
-        if (submitFeedbackButton) {
-            submitFeedbackButton.addEventListener('click', function () {
-                const name = document.getElementById('feedback_name').value.trim();
-                const email = document.getElementById('feedback_email').value.trim();
-                const message = document.getElementById('feedback_message').value.trim();
-
-                // Basic validation
-                if (name === '' || email === '' || message === '') {
-                    alert('Please fill all feedback fields');
-                    return;
-                }
-
-                // Show loading state
-                submitFeedbackButton.disabled = true;
-                submitFeedbackButton.innerHTML = 'Submitting...';
-
-                // Create form data object
-                const formData = new FormData();
-                formData.append('name', name);
-                formData.append('email', email);
-                formData.append('message', message);
-
-                // Use fetch instead of XMLHttpRequest for better error handling
-                fetch('submit_feedback.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Successfully stored feedback, now automatically submit the application
-                        feedbackModal.classList.add('hidden');
-                        
-                        // Show loading indicator
-                        const loadingModal = document.createElement('div');
-                        loadingModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75';
-                        loadingModal.innerHTML = `
-                            <div class="bg-white p-6 rounded-lg shadow-xl">
-                                <div class="flex items-center space-x-3">
-                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                                    <span class="text-lg font-medium text-gray-700">Submitting your application...</span>
-                                </div>
-                            </div>
-                        `;
-                        document.body.appendChild(loadingModal);
-                        
-                        // Check if application was already submitted
-                        const isAlreadySubmitted = localStorage.getItem('application_submitted');
-                        if (isAlreadySubmitted) {
-                            document.body.removeChild(loadingModal);
-                            Swal.fire({
-                                title: 'Already Submitted',
-                                text: 'You have already submitted your application.',
-                                icon: 'info',
-                                confirmButtonColor: '#16a34a'
-                            });
-                            return;
-                        }
-                        
-                        // Create a new FormData object with all form data
-                        const applicationForm = document.querySelector('form');
-                        const formData = new FormData(applicationForm);
-                        formData.append('submit_application', '1');
-                        
-                        // Submit the application via AJAX
-                        fetch(window.location.href, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.text())
-                        .then(result => {
-                            document.body.removeChild(loadingModal);
-                            
-                            // Mark as submitted in localStorage
-                            localStorage.setItem('application_submitted', 'true');
-                            
-                            // Disable all form inputs to prevent resubmission
-                            const formInputs = applicationForm.querySelectorAll('input, textarea, select, button');
-                            formInputs.forEach(input => {
-                                input.disabled = true;
-                            });
-                            
-                            // Show success message
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'Application submitted successfully!',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                window.location.href = 'index.php';
-                            });
-                        })
-                        .catch(error => {
-                            document.body.removeChild(loadingModal);
-                            console.error('Error submitting application:', error);
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'There was an error submitting your application. Please try again.',
-                                icon: 'error',
-                                confirmButtonColor: '#16a34a'
-                            });
-                        });
-                    } else {
-                        alert(data.message || 'There was an error saving your feedback. Please try again.');
-                        // Reset button state
-                        submitFeedbackButton.disabled = false;
-                        submitFeedbackButton.innerHTML = 'Submit Feedback';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('There was an error processing your feedback. Please try again later.');
-                    // Reset button state
-                    submitFeedbackButton.disabled = false;
-                    submitFeedbackButton.innerHTML = 'Submit Feedback';
-                });
-            });
-        }
-
-        // Close submit modal when cancel button is clicked
-        if (closeSubmitModalButton) {
-            closeSubmitModalButton.addEventListener('click', function () {
-                submitModal.classList.add('hidden');
-            });
-        }
-
-        // Close modals when clicking outside
-        window.addEventListener('click', function (event) {
-            if (event.target === feedbackModal) {
-                feedbackModal.classList.add('hidden');
-            }
-            if (event.target === submitModal) {
-                submitModal.classList.add('hidden');
-            }
-        });
     });
 </script>
 
-<!-- Submit Application Modal -->
-<div id="submitModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-        <div class="fixed inset-0 transition-opacity bg-gray-800 bg-opacity-75"></div>
-        <div
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div
-                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                            </path>
-                        </svg>
-                    </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">Submit Application</h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500">
-                                Please confirm that you have reviewed all your information and are ready to submit your
-                                scholarship application.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="submit" name="submit_application"
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Submit Application
-                </button>
-                <button type="button" id="closeSubmitModal"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Feedback Modal -->
-<div id="feedbackModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-        <div class="fixed inset-0 transition-opacity bg-gray-800 bg-opacity-75"></div>
-        <div
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div
-                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                    </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">We Value Your Feedback</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    To proceed with your application, your feedback is required. Kindly share your
-                                    thoughts to help us improve our services. Thank you for your cooperation.
-                                </p>
-                                <div class="mt-4 space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                        <input type="text" id="feedback_name" name="feedback_name"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                                            required>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                        <input type="email" id="feedback_email" name="feedback_email"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                                            required>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                                        <textarea id="feedback_message" name="feedback_message" rows="3"
-                                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                                            required></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="submitFeedbackBtn"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Submit Feedback
-                    </button>
-                    <button type="button" id="closeFeedbackModal"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <?php include 'components/footer.php'; ?>
+<?php include 'components/footer.php'; ?>
